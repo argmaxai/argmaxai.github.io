@@ -1,0 +1,403 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+  
+		
+
+		<title>Deep Variational Bayes Filter · argmax.ai</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+	
+		<link rel="stylesheet" href="https://argmax.ai/theme/css/main.css" />
+		<link rel="stylesheet" href="https://argmax.ai/theme/css/pygment.css" />
+		<link rel="stylesheet" href="https://argmax.ai/theme/css/custom.css" />
+		<!--[if lte IE 9]><link rel="stylesheet" href="https://argmax.ai/theme/css/ie9.css" /><![endif]-->
+		<!--[if lte IE 8]><link rel="stylesheet" href="https://argmax.ai/theme/css/ie8.css" /><![endif]-->
+
+
+		<style>
+		body {
+		    background: #fffaff;
+		}
+		</style>
+		
+
+
+		<script src="https://argmax.ai/theme/js/jquery.min.js"></script>
+
+
+		<link rel="shortcut icon" href="https://argmax.ai/images/iconified/favicon.ico" type="image/x-icon" />
+		<link rel="apple-touch-icon" href="https://argmax.ai/images/iconified/apple-touch-icon.png" />
+		<link rel="apple-touch-icon" sizes="57x57" href="https://argmax.ai/images/iconified/apple-touch-icon-57x57.png" />
+		<link rel="apple-touch-icon" sizes="72x72" href="https://argmax.ai/images/iconified/apple-touch-icon-72x72.png" />
+		<link rel="apple-touch-icon" sizes="76x76" href="https://argmax.ai/images/iconified/apple-touch-icon-76x76.png" />
+		<link rel="apple-touch-icon" sizes="114x114" href="https://argmax.ai/images/iconified/apple-touch-icon-114x114.png" />
+		<link rel="apple-touch-icon" sizes="120x120" href="https://argmax.ai/images/iconified/apple-touch-icon-120x120.png" />
+		<link rel="apple-touch-icon" sizes="144x144" href="https://argmax.ai/images/iconified/apple-touch-icon-144x144.png" />
+		<link rel="apple-touch-icon" sizes="152x152" href="https://argmax.ai/images/iconified/apple-touch-icon-152x152.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="https://argmax.ai/images/iconified/apple-touch-icon-180x180.png" />
+
+
+  <meta property="og:title" content="Deep Variational Bayes Filter - argmax.ai"/>
+    <meta property="og:image" content="https://argmax.ai/images/latents_reconstruction.png"/>
+  <meta property="og:description" content="Machine-learning algorithms thrive in environments where data is abundant. In the land of scarce data, blessed are those who have simulators. The recent successes in Go or Atari games would be much harder to achieve without the ability to parallelise millions of perfect game simulations."/>
+  <meta property="og:url" content="https://argmax.ai/blog/dvbfintro/" />
+
+
+
+    <meta name="tags" contents="dvbf" />
+    <meta name="tags" contents="time series" />
+    <meta name="tags" contents="vae" />
+    <meta name="tags" contents="latent variable models" />
+
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+  <script src="https://argmax.ai/theme/js/custom.js"></script>
+
+
+	</head>
+	<body class="single">
+      <progress value="0"></progress>
+	<!-- Wrapper -->
+		<div id="wrapper">
+
+			<!-- Header -->
+				<header id="header">
+					<h1><a href="https://argmax.ai/">argmax.ai</a></h1>
+					<nav class="links">
+	
+						<ul>
+							<li><a href="https://argmax.ai/papers">Papers</a></li>
+
+							<li><a href="https://argmax.ai/blog/">blog</a></li>
+							<li><a href="https://argmax.ai/ml-course/">ml course</a></li>
+							<li><a href="https://argmax.ai/talks/">talks</a></li>
+							<li><a href="https://argmax.ai/team/">team</a></li>
+
+						</ul>
+
+					</nav>
+					
+					<nav class="main">
+						<ul>
+							<!-- Social -->
+
+							<li class="menu">
+								<a class="fa-edit" href="https://gitlab.com/-/ide/project/argmax-ai/misc/argmax_blog_source/edit/master/-/content/blog/2018-04-16_dvbfintro.md">Edit</a>
+							</li>
+
+							<li class="search">
+								<a class="fa-search" href="#search">Search</a>
+								<form id="search" method="get" action="https://argmax.ai/search.html">
+									<input type="text" name="q" placeholder="Search" id="tipue_search_input" autocomplete="off" required />
+								</form>
+							</li>
+							<li class="menu">
+								<a class="fa-bars" href="#menu">Menu</a>
+							</li>
+						</ul>
+					</nav>
+				</header>
+
+			<!-- Menu -->
+<section id="menu">
+
+  <!-- Search -->
+    <section>
+      <form class="search" method="get" action="https://argmax.ai/search.html">
+        <input type="text" name="q" id="tipue_search_input" placeholder="Search" autocomplete="off" required />
+      </form>
+    </section>
+
+  <!-- Links -->
+    <section>
+      <ul class="links">
+
+
+
+        <li>
+          <a href="https://argmax.ai/papers">
+            <h3>Papers</h3>
+<p>Our latest publications</p>          </a>
+        </li>
+
+        <li>
+          <a href="https://argmax.ai/blog/">
+            <h3>blog</h3>
+<p>Implementations, papers, opinions, etc.</p>          </a>
+        </li>
+        <li>
+          <a href="https://argmax.ai/ml-course/">
+            <h3>ml course</h3>
+<p>Video lectures and slides on Machine Learning</p>          </a>
+        </li>
+        <li>
+          <a href="https://argmax.ai/talks/">
+            <h3>talks</h3>
+<p>Open scientific talks</p>          </a>
+        </li>
+        <li>
+          <a href="https://argmax.ai/team/">
+            <h3>team</h3>
+<p>The whole crew</p>          </a>
+        </li>
+
+
+      </ul>
+    </section>
+
+  <!-- Social -->
+
+<!-- 
+    <section>
+      <ul class="align-center actions horizontal">
+        <li><a href="None" class="icon fa-feed"><span class="label">RSS</span></a></li>
+      </ul>
+    </section>
+ -->
+
+  <!-- Actions -->
+<!--  -->
+    <section>
+      <ul class="actions vertical">
+        <li><a href="https://argmax.ai/about" class="button big fit">About</a></li>
+      </ul>
+    </section>
+
+</section>
+			<!-- Main -->
+<div id="main">
+  <article class="post">
+    <header>
+      <div class="title">
+        <h2>
+        Deep Variational Bayes Filter
+        </h2>
+        <p>DVBF: filter to learn what to filter</p>
+      </div>
+      <div class="meta">
+        <time class="published" datetime="2018-04-16T00:00:00+02:00">16 April 2018</time>
+
+
+
+        <a class="author" href="https://argmax.ai/team/maximilian-soelch">
+        <span class="name">Maximilian Soelch</span>
+        <img src="https://argmax.ai/images/avatars/maxs.png" alt="" />
+        </a>
+      </div>
+    </header>
+
+    <figure class="cap-left">
+    <img class="image featured" src="https://argmax.ai/images/latents_reconstruction.png" alt="" />
+        <figcaption>
+          Learnt latent representation of a swinging pendulum
+        </figcaption>
+    </figure>
+     
+    <p >
+        <p>Machine-learning algorithms thrive in environments where data is abundant. In the land of scarce data, blessed are those who have simulators. The recent successes in Go or Atari games would be much harder to achieve without the ability to parallelise millions of perfect game simulations. </p>
+
+
+<p>But in many other domains, we cannot use this approach. For instance robotics, where simulations often fall short. After all, only phenomena that are understood well enough can be simulated. Everything else is necessarily idealised and abstracted. If we had accurate simulators for such domains, we could devise much more efficient learning algorithms around them. Just like we don't need to play millions of real-world games to make a machine learn Go, we wouldn't need to run dozens of robots for countless hours to acquire sufficient data. </p>
+<p>The key to simulators in these domains is accurate prediction. As Niels Bohr pointedly put it: "Prediction is very difficult, especially if it's about the future." Luckily, machine learning is not alone in its quest for better predictions. Better predictions are the driving factor behind many scientific disciplines: any scientific hypothesis must allow falsifiable predictions. </p>
+<p>In this post, we will be looking into the approaches developed in other fields. We will draw inspirations from established methods, and introduce our own algorithm Deep Variational Bayes Filters (DVBF, <a href='#karls2016deep' id='ref-karls2016deep-1'>Karl et al. (2017)</a>). DVBF solves shortcomings of many established method with the help of machine learning.</p>
+<h2 id="differential-equations">Differential equations</h2>
+<p>Let's start in Niels Bohr's own domain, physics. For 350 years, physicists have been using an elegant way for describing processes&mdash;differential equations. At its core, a differential equation is a predictor: how will a process evolve over time? And does that prediction comply with the observations we make in the real world?</p>
+<p>Why are differential equations such a successful tool? Let us look at a simple example, a one-link robot, also known as damped pendulum. We try to predict the displacement angle <span class="math">\(\theta\)</span> over time. This process is governed by the differential equation</p>
+<div class="math">$$\ddot\theta = -\frac bm\dot\theta - \frac gL \sin\theta.$$</div>
+<p>This simple example highlights the core features of differential equations at work.</p>
+<ol>
+<li>The differential equation is <strong>compact</strong> and <strong>local</strong>: we prefer to know the <em>changes</em> that will happen in a short horizon instead of the brittle global evolution. Instead of specifying a complicated, often brittle function <span class="math">\(\theta(t, \theta_0)\)</span> for the angle at any point in time <span class="math">\(t\)</span> from any initial displacement <span class="math">\(\theta_0\)</span>, it describes how the angle <em>acceleration</em> <span class="math">\(\ddot\theta\)</span> is affected by the <em>current</em> state of the system, its displacement angle <span class="math">\(\theta\)</span> and the angle velocity <span class="math">\(\dot\theta\)</span>.</li>
+<li><em>Because</em> we locally look at the pendulum, we achieve a <strong>modular</strong> description: the differential equation consists of two separate terms&mdash;damping from friction, <span class="math">\(\frac bm\dot\theta\)</span>, and acceleration from gravity, <span class="math">\(\frac gL \sin\theta\)</span>. In a global description, we would need to consider their complex interplay. The local description makes things simpler, and it allows us to add or leave away assumptions.</li>
+</ol>
+<h2 id="state-space-systems">State-space systems</h2>
+<p>Now we know the differential equation governing the pendulum. It depends on angle and angle velocity, and <em>given these</em> we can predict the evolution of the process. Great! What's left?</p>
+<p>Well, we need to obtain angle and angle velocity starting configuration for our prediction. The easy way out is to mount appropriate sensors and to keep our fingers crossed someone calibrated them properly. But more often than not, this is not an option. Plus it's boring! A camera, instead, is relatively cheap and easy to install. </p>
+<p><img class="image right" src="https://argmax.ai/images/pendulum.gif"></p>
+<p>On the right is a (synthetic) video sequence of a simulated pendulum. In fact, for a human it's easy to predict how this video sequence will continue, because we have understood the underlying physical process. But how do we access the information about the state of the pendulum that is hidden in the pixels? Let us rephrase the question: how does the video frame at time <span class="math">\(t\)</span> differ from angle and angle velocity at that point in time? What makes it easier to describe the dynamical process in terms of angles and angle velocities rather than pixels?</p>
+<p>Answering this question lead to the concept of <em>state-space systems</em>. In these systems, we make a distinction between the latent state <span class="math">\(\mathbf z_t\)</span> of a system, like angle and velocity, and observations <span class="math">\(\mathbf x_t\)</span> of it, like video frames. A state-space system consists of two components:</p>
+<ol>
+<li>Dynamics on the state, like a differential equation (or, because we siletnly switched to the more computer-friendly discrete systems, a <em>difference equation</em>). It is a low-dimensional, often minimal description of the process. We will generally refer to this as the (latent) state transition.</li>
+<li>A rendering or measurement process that yields observations based on the latent state. This can mean that the latent state is only partially observable. We will refer to this process as the emission model.</li>
+</ol>
+<p>The core idea is that the true state is not observed, hence <em>latent</em> state. We can only <em>infer</em> it from the observations: what is the state, given the observations we have made? This sounds a lot like posterior inference! Let's look at state-space systems from a statistical perspective.</p>
+<h2 id="filtering">Filtering</h2>
+<p>The simple latent process then becomes a distribution over a sequence of latent states, <span class="math">\(p(\mathbf z_{1:T})\)</span>. Likewise, the emission process is a distribution over the observations given the latent states, <span class="math">\(p(\mathbf x_{1:T}\mid\mathbf z_{1:T})\)</span>. Our question&mdash;what is the state, given the observations we have made?&mdash;can now be answered in a rigorous framework. The answer is the posterior distribution <span class="math">\(p(\mathbf z_{1:T}\mid\mathbf x_{1:T})\)</span>, and by Bayes' theorem  <span class="math">\(p(\mathbf z_{1:T}\mid\mathbf x_{1:T}) \propto p(\mathbf x_{1:T}\mid\mathbf z_{1:T})p(\mathbf z_{1:T})\)</span>. In our scenarios, this posterior distribution is also called <em>filter distribution</em>: it filters the quintessential information, the latent state, from the observations. The resulting algorithms are called <em>Bayes filters</em>.</p>
+<p>Arguably the most famous implementation of such a Bayes filter is the <a href="http://www.bzarg.com/p/how-a-kalman-filter-works-in-pictures/">Kalman filter</a>. Airplane autopilots depend on its tracking abilities, as does your GPS navigation system, and many, many more.</p>
+<h2 id="where-is-the-limit">Where is the limit?</h2>
+<p>Done!? Not quite yet. The Kalman filter succeeds by putting strong assumptions on the state-space system, in that both the difference equation and the measurement process need to be linear Gaussian models. The Kalman filter is provably optimal <em>in that setting</em>. These assumptions are (approximately) valid in many interesting scenarios. The Kalman filter is the go-to algorithm for  tracking because large-scale natural motions are approximately linear and Gaussian.  After all, it's safe to board an airplane with a Kalman filter position tracking. </p>
+<p>Yet, highly nonlinear observations, like camera frames, cannot be filtered by Kalman filters. In general cases, the Bayes filter is intractable. And there is an even bigger caveat: in all the stages so far, we assumed that we <em>know</em> the underlying process, the difference equation, and through Bayes' formula the filter depends on it. But coming up with suitable state space representations is laborious, costly, and requires a significant amount of domain knowledge.</p>
+<h2 id="deep-variational-bayes-filters">Deep Variational Bayes Filters</h2>
+<p>Luckily, over the past years machine learning has taken a deep dive into unsupervised representation learning. The most useful tool for our purposes is inference via amortised variational Bayes. It was popularised by variational auto-encoders (VAE, <a href='#kingma2014auto' id='ref-kingma2014auto-1'>Kingma and Welling (2014)</a>). </p>
+<p>A VAE learns a model <span class="math">\(p(\mathbf x \mid \mathbf z)\)</span> with a fixed prior <span class="math">\(p(\mathbf z)\)</span>, and simultaneously an <em>approximate posterior</em> <span class="math">\(q(\mathbf z \mid \mathbf x)\)</span>. The conditional random variables are implemented with neural networks. If we extend this idea to sequential data, we can tackle both caveats: we can learn an <em>approximate</em> Bayes filter even for nonlinear data; simultaneously, we learn the state transition in latent space plus the emission model. Both leverage the modelling powers of neural networks to overcome the shortcomings of methods like the Kalman filter. </p>
+<p>This is the core idea behind Deep Variational Bayes Filters (DVBF): We overcome the limitations of well-understood Bayes filters, and we do so by surgically replacing limiting components with neural networks. Instead of entirely replacing a well-established approach, we extend it to previously intractable data with findings from deep learning. This gives us the best of both worlds.</p>
+<p>And here is how DVBF looks in action on the pendulum example:</p>
+<p>
+    <div class="row uniform">
+        <div class="3u"></div>
+        <div class="6u 12u$(small)">
+            <img src="https://argmax.ai/images/dvbf_filtering.gif" class="image fit">
+        </div>
+        <div class="3u$"></div>
+    </div>
+</p>
+
+<p>The approximate filter distribution, implemented by a neural net, maps the sequence of frames into a three-dimensional latent space. The model has learnt that a two-dimensional barrel-shaped manifold is a good state-space representation.</p>
+<p>Intriguingly, when we compare the latent state to the ground truth, we find a strong relation. Without a notion of pendulum physics or even angles, the learning algorithm autonomously encodes the real-world angle on a circle, and the ground-truth angle velocity is encoded perpendicular to that. The smooth colouring using ground-truth angle data highlights that. </p>
+<p>At this point, our journey in this article has gone full circle: we started off by looking at the differential equation of the pendulum, and after a series of further considerations, we have found an unsupervised algorithm that learns transitions akin to this very differential equation from raw data.</p>
+<p>And just like differential equations, this approach is compact, local, and modular. Especially the modularity can be used to our advantage. Instead of using a less interpretable neural network, we may use other components that make use of some system knowledge. We can compose the latent state process from simple principles, rather than ever more complex models in the observation space.</p>
+<p>We've also trained a probabilistic model of our system. A simulator! We can sample the behaviour of the system without interacting with it in the real world.</p>
+<h2 id="whats-next">What's next?</h2>
+<p>Arguably, we dealt with not more than an illustrative example in this post. Yet applications of DVBF all but stop here. Having an explicit model for sequence data is very valuable, and we will close this post by looking at two advanced applications.</p>
+<p>The first successful application of DVBF is Empowerment <a href='#karl_unsupervised_2017' id='ref-karl_unsupervised_2017-1'>Karl et al. (2017)</a>. Loosely speaking, empowerment is a measure of how diversely and effectively an agent can influence its environment. As such, it is a natural candidate for intrinsic motivation in control an reinforcement learning. We have shown that Empowerment can lead to meaningful behaviour in very different agents and environments in the absence of any other cost function.</p>
+<p>At the core of our Empowerment algorithm is DVBF. An agent needs to be aware of the consequences of its actions to be able to estimate its current Empowerment. If the agent can query a simulation rather than interacting with the environment, this stabilises the empowerment estimates.</p>
+<p>
+    <div class="row uniform">
+        <div class="2u"></div>
+        <div class="8u 12u$(small)">
+            <img src="https://argmax.ai/images/tactilesensors.jpg" class="image fit">
+        </div>
+        <div class="2u$"></div>
+    </div>
+</p>
+
+<p>Another important application is a new view on sensors. Sensors are expensive because it is difficult to manufacture them with good calibration properties. In our lab, we have applied this principle to artificial skin. Rather than the costly state-of-the-art sensors, we can produce durable tactile sensors at a fraction of the cost, and reach sensor accuracy by post-processing the low-quality data with DVBF.</p>
+<p>We will take a closer look at these two cases in later posts on this blog.</p>
+<p><em>An open-source version of DVBF will be available soon; it will be announced here.</em></p>
+<p><a class="button big fit" href="https://arxiv.org/abs/1605.06432">arXiv</a></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%&#64;#$&#64;#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%&#64;#$&#64;#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script><hr>
+<h2>Bibliography</h2>
+<p id='karls2016deep'>Maximilian Karl, Maximilian Soelch, Justin Bayer, and Patrick <span class="bibtex-protected">van der Smagt</span>.
+Deep variational bayes filters: unsupervised learning of state space models from raw data.
+In <em>Proceedings of the International Conference on Learning Representations (ICLR)</em>. 2017.
+URL: <a href="http://arxiv.org/abs/1605.06432">http://arxiv.org/abs/1605.06432</a>. <a class="cite-backref" href="#ref-karls2016deep-1" title="Jump back to reference 1">↩</a></p>
+<p id='karl_unsupervised_2017'>Maximilian Karl, Maximilian Soelch, Philip Becker-Ehmck, Djalel Benbouzid, Patrick van&nbsp;der Smagt, and Justin Bayer.
+Unsupervised real-time control through variational empowerment.
+<em><span class="bibtex-protected">arXiv</span>:1710.05101 [stat]</em>, 2017.
+URL: <a href="http://arxiv.org/abs/1710.05101">http://arxiv.org/abs/1710.05101</a>, <a href="https://arxiv.org/abs/1710.05101">arXiv:1710.05101</a>. <a class="cite-backref" href="#ref-karl_unsupervised_2017-1" title="Jump back to reference 1">↩</a></p>
+<p id='kingma2014auto'><span class="bibtex-protected">Diederik P</span> Kingma and Max Welling.
+Auto-encoding variational bayes.
+In <em>Proceedings of the 2nd International Conference on Learning Representations (ICLR)</em>. 2014. <a class="cite-backref" href="#ref-kingma2014auto-1" title="Jump back to reference 1">↩</a></p>
+
+    </p>
+
+    <footer>
+      <ul class="stats">
+        <!-- <li id='article_category'><a href="https://argmax.ai/blog/">blog</a></li> -->
+
+
+          <li><a target="_blank" href='mailto:?subject=Sharing a post from argmax.ai&body=Check out this post I came across "Deep Variational Bayes Filter" at https://argmax.ai/blog/dvbfintro/"' class="icon fa-envelope">Email</a></li>
+          <li><a target="_blank" href='http://twitter.com/intent/tweet?status=Deep Variational Bayes Filter+https://argmax.ai/blog/dvbfintro/' class="icon fa-twitter">Twitter</a></li>
+          <li><a target="_blank" href='http://www.reddit.com/submit?url=https://argmax.ai/blog/dvbfintro/&title=Deep Variational Bayes Filter' class="icon fa-reddit">Reddit</a></li>
+          <li><a target="_blank" href="http://www.linkedin.com/shareArticle?mini=true&url=https://argmax.ai/blog/dvbfintro/&title=Deep Variational Bayes Filter&source=https://argmax.ai" class="icon fa-linkedin">LinkedIn</a></li>
+          <li><a target="_blank" href='https://news.ycombinator.com/submitlink?t=Deep Variational Bayes Filter&u=https://argmax.ai/blog/dvbfintro/' class="icon fa-hacker-news">HackerNews</a></li>
+
+      </ul>
+    </footer>
+  </article>
+
+  <ul class="actions pagination">
+
+        <li><a href="https://argmax.ai/blog/archopt/" class="button previous">Network Architecture Optimisation</a></li>
+
+        <li><a href="https://argmax.ai/blog/about/" class="button next">About</a></li>
+  </ul>
+  
+</div>
+
+
+
+<section>
+  <h2>Related</h2>
+  <div class="mini-posts">
+      <article class="mini-post">
+        <header>
+          <h3><a href="https://argmax.ai/blog/geodesic/" rel="bookmark" title="Permalink to Approximate Geodesics for Deep Generative Models">Approximate Geodesics for Deep Generative Models</a></h3>
+          <time class="published">How to efficiently find the shortest path in latent space</time>
+
+
+          <a class="author" href="https://argmax.ai/team/nutan-chen">
+          <img src="https://argmax.ai/images/avatars/chen_mini.jpg" alt="" />
+          </a>
+        </header>
+        <a href="https://argmax.ai/blog/geodesic/" class="image"><img src="https://argmax.ai/images/geodesic/fashion_graph.png" alt="" /></a>
+      </article>
+  </div>
+</section>
+
+
+
+<div id="comments" class="comments">
+
+</div>
+
+<section id="footer">
+  <p class="copyright">&copy; argmax.ai  - <a href="https://argmax.ai//imprint">Imprint</a> - <a href="https://argmax.ai//data-protection">Data Protection</a> - <a href="https://argmax.ai//copyright">Copyright</a>
+</section><!-- <section id="footer">
+  <p class="copyright">&copy; argmax.ai. 
+  Powered by <a href="http://blog.getpelican.com/">Pelican</a>.</p>
+</section> -->
+		</div>
+
+	<!-- Scripts -->
+		<script src="https://argmax.ai/theme/js/skel.min.js"></script>
+		<script src="https://argmax.ai/theme/js/util.js"></script>
+		<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+		<script src="https://argmax.ai/theme/js/main.js"></script>
+
+	</body>
+</html>

@@ -1,0 +1,422 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+  
+		
+
+		<title>Approximate Geodesics for Deep Generative Models · argmax.ai</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+	
+		<link rel="stylesheet" href="https://argmax.ai/theme/css/main.css" />
+		<link rel="stylesheet" href="https://argmax.ai/theme/css/pygment.css" />
+		<link rel="stylesheet" href="https://argmax.ai/theme/css/custom.css" />
+		<!--[if lte IE 9]><link rel="stylesheet" href="https://argmax.ai/theme/css/ie9.css" /><![endif]-->
+		<!--[if lte IE 8]><link rel="stylesheet" href="https://argmax.ai/theme/css/ie8.css" /><![endif]-->
+
+
+		<style>
+		body {
+		    background: #fffaff;
+		}
+		</style>
+		
+
+
+		<script src="https://argmax.ai/theme/js/jquery.min.js"></script>
+
+
+		<link rel="shortcut icon" href="https://argmax.ai/images/iconified/favicon.ico" type="image/x-icon" />
+		<link rel="apple-touch-icon" href="https://argmax.ai/images/iconified/apple-touch-icon.png" />
+		<link rel="apple-touch-icon" sizes="57x57" href="https://argmax.ai/images/iconified/apple-touch-icon-57x57.png" />
+		<link rel="apple-touch-icon" sizes="72x72" href="https://argmax.ai/images/iconified/apple-touch-icon-72x72.png" />
+		<link rel="apple-touch-icon" sizes="76x76" href="https://argmax.ai/images/iconified/apple-touch-icon-76x76.png" />
+		<link rel="apple-touch-icon" sizes="114x114" href="https://argmax.ai/images/iconified/apple-touch-icon-114x114.png" />
+		<link rel="apple-touch-icon" sizes="120x120" href="https://argmax.ai/images/iconified/apple-touch-icon-120x120.png" />
+		<link rel="apple-touch-icon" sizes="144x144" href="https://argmax.ai/images/iconified/apple-touch-icon-144x144.png" />
+		<link rel="apple-touch-icon" sizes="152x152" href="https://argmax.ai/images/iconified/apple-touch-icon-152x152.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="https://argmax.ai/images/iconified/apple-touch-icon-180x180.png" />
+
+
+  <meta property="og:title" content="Approximate Geodesics for Deep Generative Models - argmax.ai"/>
+    <meta property="og:image" content="https://argmax.ai/images/geodesic/fashion_graph.png"/>
+  <meta property="og:description" content="Neural samplers such as variational autoencoders (VAEs) or generative adversarial networks (GANs) approximate distributions by transforming samples from a simple random source—the latent space—to a more complex distribution—corresponding to the distribution from which is data is sampled. Typically, the data set is sparse, while the latent space is compact. Consequently, points that are separated by low-density regions in observation space will be pushed together in latent space, and the spaces get distored. In effect, stationary distances in the latent space are poor proxies for similarity in the observation space. How can this be solved?"/>
+  <meta property="og:url" content="https://argmax.ai/blog/geodesic/" />
+
+
+
+    <meta name="tags" contents="latent-variable models" />
+    <meta name="tags" contents="Riemannian geometry" />
+
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+  <script src="https://argmax.ai/theme/js/custom.js"></script>
+
+
+	</head>
+	<body class="single">
+      <progress value="0"></progress>
+	<!-- Wrapper -->
+		<div id="wrapper">
+
+			<!-- Header -->
+				<header id="header">
+					<h1><a href="https://argmax.ai/">argmax.ai</a></h1>
+					<nav class="links">
+	
+						<ul>
+							<li><a href="https://argmax.ai/papers">Papers</a></li>
+
+							<li><a href="https://argmax.ai/blog/">blog</a></li>
+							<li><a href="https://argmax.ai/ml-course/">ml course</a></li>
+							<li><a href="https://argmax.ai/talks/">talks</a></li>
+							<li><a href="https://argmax.ai/team/">team</a></li>
+
+						</ul>
+
+					</nav>
+					
+					<nav class="main">
+						<ul>
+							<!-- Social -->
+
+							<li class="menu">
+								<a class="fa-edit" href="https://gitlab.com/-/ide/project/argmax-ai/misc/argmax_blog_source/edit/master/-/content/blog/2019-10-08_geodesic.md">Edit</a>
+							</li>
+
+							<li class="search">
+								<a class="fa-search" href="#search">Search</a>
+								<form id="search" method="get" action="https://argmax.ai/search.html">
+									<input type="text" name="q" placeholder="Search" id="tipue_search_input" autocomplete="off" required />
+								</form>
+							</li>
+							<li class="menu">
+								<a class="fa-bars" href="#menu">Menu</a>
+							</li>
+						</ul>
+					</nav>
+				</header>
+
+			<!-- Menu -->
+<section id="menu">
+
+  <!-- Search -->
+    <section>
+      <form class="search" method="get" action="https://argmax.ai/search.html">
+        <input type="text" name="q" id="tipue_search_input" placeholder="Search" autocomplete="off" required />
+      </form>
+    </section>
+
+  <!-- Links -->
+    <section>
+      <ul class="links">
+
+
+
+        <li>
+          <a href="https://argmax.ai/papers">
+            <h3>Papers</h3>
+<p>Our latest publications</p>          </a>
+        </li>
+
+        <li>
+          <a href="https://argmax.ai/blog/">
+            <h3>blog</h3>
+<p>Implementations, papers, opinions, etc.</p>          </a>
+        </li>
+        <li>
+          <a href="https://argmax.ai/ml-course/">
+            <h3>ml course</h3>
+<p>Video lectures and slides on Machine Learning</p>          </a>
+        </li>
+        <li>
+          <a href="https://argmax.ai/talks/">
+            <h3>talks</h3>
+<p>Open scientific talks</p>          </a>
+        </li>
+        <li>
+          <a href="https://argmax.ai/team/">
+            <h3>team</h3>
+<p>The whole crew</p>          </a>
+        </li>
+
+
+      </ul>
+    </section>
+
+  <!-- Social -->
+
+<!-- 
+    <section>
+      <ul class="align-center actions horizontal">
+        <li><a href="None" class="icon fa-feed"><span class="label">RSS</span></a></li>
+      </ul>
+    </section>
+ -->
+
+  <!-- Actions -->
+<!--  -->
+    <section>
+      <ul class="actions vertical">
+        <li><a href="https://argmax.ai/about" class="button big fit">About</a></li>
+      </ul>
+    </section>
+
+</section>
+			<!-- Main -->
+<div id="main">
+  <article class="post">
+    <header>
+      <div class="title">
+        <h2>
+        Approximate Geodesics for Deep Generative Models
+        </h2>
+        <p>How to efficiently find the shortest path in latent space</p>
+      </div>
+      <div class="meta">
+        <time class="published" datetime="2019-10-08T00:00:00+02:00">08 October 2019</time>
+
+
+
+        <a class="author" href="https://argmax.ai/team/nutan-chen">
+        <span class="name">Nutan Chen</span>
+        <img src="https://argmax.ai/images/avatars/chen_mini.jpg" alt="" />
+        </a>
+      </div>
+    </header>
+
+    <figure class="cap-left">
+    <img class="image featured" src="https://argmax.ai/images/geodesic/fashion_graph.png" alt="" />
+        <figcaption>
+          The graph of the fashion MNIST dataset in a 2D latent space, along with the magnification factor.
+        </figcaption>
+    </figure>
+     
+    <p >
+        <p>Neural samplers such as variational autoencoders (VAEs) or generative adversarial networks (GANs) approximate distributions by transforming samples from a simple random source—the latent space—to a more complex distribution—corresponding to the distribution from which is data is sampled.</p>
+<p>Typically, the data set is sparse, while the latent space is compact. Consequently, points that are separated by low-density regions in observation space will be pushed together in latent space, and the spaces get distored.  In effect,  stationary distances in the latent space are poor proxies for similarity in the observation space.  How can this be solved?</p>
+
+
+<p>We transfer ideas from Riemannian geometry to this setting, letting the distance between two points be the shortest path on a Riemannian manifold induced by the transformation. 
+The method yields a principled distance measure, provides a tool for visual inspection of deep generative models, and an alternative to linear interpolation in latent space. </p>
+<h2 id="riemannian-geometry-for-generative-models">Riemannian geometry for generative models</h2>
+<p>Our model is based on the importance-weighted autoencoder (IWAE), but  can be used for any generative model. 
+In the IWAE, the observable data <span class="math">\(\mathbf{x} \in \mathbb{R}^{N_{x}}\)</span> are represented through latent variables <span class="math">\(\mathbf{z} \in \mathbb{R}^{N_{z}}\)</span>, that are based on hidden characteristics in <span class="math">\(\mathbf{x}\)</span>.  </p>
+<p>A Riemannian space is a differentiable manifold <span class="math">\(M\)</span> with an additional metric to describe its geometric properties. 
+This enables assigning an inner product in the tangent space at each point <span class="math">\(\mathbf{z}\)</span> in the latent space through the corresponding metric tensor <span class="math">\(\mathbf{G} \in \mathbb{R}^{N_z  \times N_z}\)</span>, i.e.,
+</p>
+<div class="math">$$
+\langle \mathbf{z}', \mathbf{z}'\rangle_{\mathbf{z}} := \mathbf{z}'^{T}\, \mathbf{G}(\mathbf{z})\, \mathbf{z}'
+$$</div>
+<p>
+with <span class="math">\(\mathbf{z}' \in T_{\mathbf{z}}M\)</span> and <span class="math">\(\mathbf{z} \in M\)</span>. <span class="math">\(T_{\mathbf{z}}M\)</span> is the tangent space.</p>
+<p>Treating the latent space of a VAE as a Riemannian manifold allows us to compute the observation space distance of latent variables. 
+Assuming we have a trajectory <span class="math">\(\gamma:[0, 1]\rightarrow\mathbb{R}^{N_{z}}\)</span> in the Riemannian (latent) space that is transformed by a continuous function <span class="math">\(f(\gamma(t))\)</span> (decoder) to an <span class="math">\(N_{x}\)</span>-dimensional Euclidean (observation) space. 
+The length of this trajectory in the observation space, referred to as the Riemannian distance, is defined by
+</p>
+<div class="math">$$
+\begin{align}
+L(\gamma)&amp;\equiv\int_0^1 \left\| \frac{\partial f(\gamma(t))}{\partial t}\right\| \mathrm{d}t 
+= \int_0^1 \left\| \frac{\partial f(\gamma(t))}{\partial \gamma(t)} \frac{\partial \gamma(t)}{\partial t} \right\| \mathrm{d}t
+=\int_0^1 \left\| \mathbf{J} \frac{\partial \gamma(t)}{\partial t} \right\| \mathrm{d}t,
+\end{align}
+$$</div>
+<p>
+with <span class="math">\(\dot{\gamma}(t)\)</span> denoting the time-derivative of the trajectory. 
+<span class="math">\(\sqrt{\big&lt;\gamma'(t), \gamma'(t)\big&gt;_{\gamma(t)}}\)</span> is the Riemannian velocity <span class="math">\(\phi(t)\)</span>.</p>
+<p>The metric tensor is defined as <span class="math">\(\mathbf{G}=\mathbf{J}^{T}\mathbf{J}\)</span>, with <span class="math">\(\mathbf{J}\)</span> as the Jacobian of the decoder. 
+The trajectory which minimises the Riemannian distance <span class="math">\(L(\gamma)\)</span> is referred to as the shortest path geodesic. 
+We integrate the metric tensor with <span class="math">\(n\)</span> equidistantly spaced sampling points along <span class="math">\(\gamma\)</span> to approximate the distance, i.e., 
+</p>
+<div class="math">$$
+\tilde L(\gamma) \approx \frac{1}{n}\sum^n_{i=1} \phi(t_i).
+$$</div>
+<p>
+We use the magnification factor (MF) to show the sensitivity of the generative models in 2D latent space and evaluate the approximated geodesic. 
+The <span class="math">\(\text{MF}(\mathbf{z})\equiv \sqrt{\det\mathbf{G}(\mathbf{z})}\)</span> can be interpreted as the scaling factor when moving from the Riemannian (latent) to the Euclidean (observation) space, due to the change of variables.</p>
+<h2 id="approximate-geodesics">Approximate geodesics</h2>
+<p>We proposed two approaches to approximate geodesics&mdash;neural network-based and graph-based approaches.</p>
+<h3 id="neural-network-based-geodesics">Neural network-based geodesics</h3>
+<p>As written in <a href='#ChenKK2018metrics' id='ref-ChenKK2018metrics-1'>Chen et al. (2018)</a>, we use a neural network <span class="math">\(g_{\omega}:\mathbb{R} \rightarrow \mathbb{R}^{N_{z}}\)</span> to approximate the curve <span class="math">\(\gamma\)</span> in the latent space, where <span class="math">\(\omega\)</span> are the weights and biases.</p>
+<p>With the start and end points of the curve in the latent space given as <span class="math">\(\mathbf{z}_0\)</span> and <span class="math">\(\mathbf{z}_1\)</span>, we consider the following constrained optimisation problem:
+</p>
+<div class="math">$$
+\begin{align}
+\min_{\omega} \ &amp; L(g_{\omega}(t)) \nonumber \\
+s.t. \ &amp; g_{\omega}(0) = \mathbf{z}_{0}, \ g_{\omega}(1) = \mathbf{z}_{1}.
+\end{align}
+$$</div>
+<p>
+There is an example of showing the difference between the geodesic and Euclidean interpolant using CMU human motion dataset:</p>
+<p><img class="image fit" src="https://argmax.ai/images/geodesic/human-loop.gif"></p>
+<h3 id="graph-based-geodesics">Graph-based geodesics</h3>
+<p>There are several challenges of the NN-based or similar (e.g., ODE) approaches:  </p>
+<ul>
+<li>it needs the second derivative of the decoder during the optimisation process;</li>
+<li>it scales poorly with the dimensionality of the observable and the latent space;</li>
+<li>computing the second derivative limits the selection of the neural network’s activation function.</li>
+</ul>
+<p>To bypass these hurdles we introduce a graph-based approach <a href='#chen2019fast' id='ref-chen2019fast-1'>Chen et al. (2019)</a>, where a discrete and finite graph is built in the latent space using a binary tree data structure, a k-d tree, with edge weights based on Riemannian distances. 
+Once the graph has been built, geodesics can be approximated by applying a classic search algorithm, <span class="math">\(\mathrm{A}^\star\)</span>.</p>
+<h4 id="building-the-graph">Building the graph.</h4>
+<p>The graph is structured as a k-d tree, a special case of binary space partitioning trees, where each leaf node corresponds to a k-dimensional vector. 
+The nodes of the graph are obtained by encoding the observable data <span class="math">\(\mathbf{X} = \{ \mathbf{x}^{(1)},\dots,\mathbf{x}^{(N)} \}\)</span> into their latent representations <span class="math">\(\mathbf{z}^{(i)}\)</span>. 
+This is done by using the respective mean values of the approximate posterior <span class="math">\(q_{\phi}(\mathbf{z}^{(i)}|\mathbf{x}^{(i)})\)</span>. Each node is connected by an undirected edge to its k-nearest neighbours. 
+The edge weights are set to Riemannian distances <span class="math">\(L(\gamma)\)</span>, where <span class="math">\(\gamma\)</span> is the straight line between the related pair of nodes.</p>
+<h4 id="approximating-geodesics">Approximating geodesics.</h4>
+<p>A classic graph-traversing method to obtain the shortest path between nodes is <span class="math">\(\mathrm{A}^\star\)</span> search. 
+It is an iterative algorithm that, given a graph <span class="math">\(\mathcal{G}\)</span>, maintains a sorted list of nodes that can be visited in the current state. 
+The list is typically initialised with the starting node and is being sorted according to the estimated cost of including node <span class="math">\(n\)</span> into the optimal path.
+The estimated cost is computed by <span class="math">\(f(n) = g(n) + h(n),\)</span> where <span class="math">\(g(n)\)</span> is the cost of the path from the starting node <span class="math">\(n_\mathrm{start}\)</span> to <span class="math">\(n\)</span> and <span class="math">\(h(n)\)</span> is a heuristic function that estimates the remaining cost from <span class="math">\(n\)</span> to the target node <span class="math">\(n_\mathrm{target}\)</span>.</p>
+<p>There is an example of showing the difference between the geodesic and Euclidean interpolant using the chair dataset:</p>
+<p>
+    <div class="row uniform">
+        <div class="1u"></div>
+        <div class="10u 12u$(small)">
+            <img src="https://argmax.ai/images/geodesic/chair-loop.gif" class="image fit">
+        </div>
+        <div class="1u$"></div>
+    </div>
+</p>
+
+<!-- {% img image fit {filename}/images/geodesic/chair-loop.gif %} -->
+
+<h2 id="applied-to-robot-active-learning">Applied to robot active learning</h2>
+<p>Our method is applied to robot motion generation and active learning. See more details in <a href='#chen2018active' id='ref-chen2018active-1'>Chen et al. (2018)</a>.</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%&#64;#$&#64;#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%&#64;#$&#64;#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script><hr>
+<h2>Bibliography</h2>
+<p id='chen2019fast'>Nutan Chen, Francesco Ferroni, Alexej Klushyn, Alexandros Paraschos, Justin Bayer, and Patrick van&nbsp;der Smagt.
+Fast approximate geodesics for deep generative models.
+In <em>ICANN</em>. 2019.
+URL: <a href="https://arxiv.org/abs/1812.08284">https://arxiv.org/abs/1812.08284</a>. <a class="cite-backref" href="#ref-chen2019fast-1" title="Jump back to reference 1">↩</a></p>
+<p id='ChenKK2018metrics'>Nutan Chen, Alexej Klushyn, Richard Kurle, Xueyan Jiang, Justin Bayer, and Patrick van&nbsp;der Smagt.
+Metrics for deep generative models.
+In <em>AISTATS</em>, 1540–1550. 2018.
+URL: <a href="https://arxiv.org/abs/1711.01204">https://arxiv.org/abs/1711.01204</a>. <a class="cite-backref" href="#ref-ChenKK2018metrics-1" title="Jump back to reference 1">↩</a></p>
+<p id='chen2018active'>Nutan Chen, Alexej Klushyn, Alexandros Paraschos, Djalel Benbouzid, and Patrick van&nbsp;der Smagt.
+Active learning based on data uncertainty and model sensitivity.
+<em>IEEE/RSJ IROS</em>, 2018.
+URL: <a href="https://arxiv.org/abs/1808.02026">https://arxiv.org/abs/1808.02026</a>. <a class="cite-backref" href="#ref-chen2018active-1" title="Jump back to reference 1">↩</a></p>
+
+    </p>
+
+    <footer>
+      <ul class="stats">
+        <!-- <li id='article_category'><a href="https://argmax.ai/blog/">blog</a></li> -->
+
+
+          <li><a target="_blank" href='mailto:?subject=Sharing a post from argmax.ai&body=Check out this post I came across "Approximate Geodesics for Deep Generative Models" at https://argmax.ai/blog/geodesic/"' class="icon fa-envelope">Email</a></li>
+          <li><a target="_blank" href='http://twitter.com/intent/tweet?status=Approximate Geodesics for Deep Generative Models+https://argmax.ai/blog/geodesic/' class="icon fa-twitter">Twitter</a></li>
+          <li><a target="_blank" href='http://www.reddit.com/submit?url=https://argmax.ai/blog/geodesic/&title=Approximate Geodesics for Deep Generative Models' class="icon fa-reddit">Reddit</a></li>
+          <li><a target="_blank" href="http://www.linkedin.com/shareArticle?mini=true&url=https://argmax.ai/blog/geodesic/&title=Approximate Geodesics for Deep Generative Models&source=https://argmax.ai" class="icon fa-linkedin">LinkedIn</a></li>
+          <li><a target="_blank" href='https://news.ycombinator.com/submitlink?t=Approximate Geodesics for Deep Generative Models&u=https://argmax.ai/blog/geodesic/' class="icon fa-hacker-news">HackerNews</a></li>
+
+      </ul>
+    </footer>
+  </article>
+
+  <ul class="actions pagination">
+
+        <li><a href="https://argmax.ai/blog/setinvariance/" class="button previous">How to Learn Functions on Sets with Neural Networks</a></li>
+
+        <li><a href="https://argmax.ai/blog/archopt/" class="button next">Network Architecture Optimisation</a></li>
+  </ul>
+  
+</div>
+
+
+
+<section>
+  <h2>Related</h2>
+  <div class="mini-posts">
+      <article class="mini-post">
+        <header>
+          <h3><a href="https://argmax.ai/blog/dvbfintro/" rel="bookmark" title="Permalink to Deep Variational Bayes Filter">Deep Variational Bayes Filter</a></h3>
+          <time class="published">DVBF: filter to learn what to filter</time>
+
+
+          <a class="author" href="https://argmax.ai/team/maximilian-soelch">
+          <img src="https://argmax.ai/images/avatars/maxs.png" alt="" />
+          </a>
+        </header>
+        <a href="https://argmax.ai/blog/dvbfintro/" class="image"><img src="https://argmax.ai/images/latents_reconstruction.png" alt="" /></a>
+      </article>
+  </div>
+</section>
+
+
+
+<div id="comments" class="comments">
+
+</div>
+
+<section id="footer">
+  <p class="copyright">&copy; argmax.ai  - <a href="https://argmax.ai//imprint">Imprint</a> - <a href="https://argmax.ai//data-protection">Data Protection</a> - <a href="https://argmax.ai//copyright">Copyright</a>
+</section><!-- <section id="footer">
+  <p class="copyright">&copy; argmax.ai. 
+  Powered by <a href="http://blog.getpelican.com/">Pelican</a>.</p>
+</section> -->
+		</div>
+
+	<!-- Scripts -->
+		<script src="https://argmax.ai/theme/js/skel.min.js"></script>
+		<script src="https://argmax.ai/theme/js/util.js"></script>
+		<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+		<script src="https://argmax.ai/theme/js/main.js"></script>
+
+	</body>
+</html>

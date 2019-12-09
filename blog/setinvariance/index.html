@@ -1,0 +1,367 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+  
+		
+
+		<title>How to Learn Functions on Sets with Neural Networks · argmax.ai</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+	
+		<link rel="stylesheet" href="https://argmax.ai/theme/css/main.css" />
+		<link rel="stylesheet" href="https://argmax.ai/theme/css/pygment.css" />
+		<link rel="stylesheet" href="https://argmax.ai/theme/css/custom.css" />
+		<!--[if lte IE 9]><link rel="stylesheet" href="https://argmax.ai/theme/css/ie9.css" /><![endif]-->
+		<!--[if lte IE 8]><link rel="stylesheet" href="https://argmax.ai/theme/css/ie8.css" /><![endif]-->
+
+
+		<style>
+		body {
+		    background: #fffaff;
+		}
+		</style>
+		
+
+
+		<script src="https://argmax.ai/theme/js/jquery.min.js"></script>
+
+
+		<link rel="shortcut icon" href="https://argmax.ai/images/iconified/favicon.ico" type="image/x-icon" />
+		<link rel="apple-touch-icon" href="https://argmax.ai/images/iconified/apple-touch-icon.png" />
+		<link rel="apple-touch-icon" sizes="57x57" href="https://argmax.ai/images/iconified/apple-touch-icon-57x57.png" />
+		<link rel="apple-touch-icon" sizes="72x72" href="https://argmax.ai/images/iconified/apple-touch-icon-72x72.png" />
+		<link rel="apple-touch-icon" sizes="76x76" href="https://argmax.ai/images/iconified/apple-touch-icon-76x76.png" />
+		<link rel="apple-touch-icon" sizes="114x114" href="https://argmax.ai/images/iconified/apple-touch-icon-114x114.png" />
+		<link rel="apple-touch-icon" sizes="120x120" href="https://argmax.ai/images/iconified/apple-touch-icon-120x120.png" />
+		<link rel="apple-touch-icon" sizes="144x144" href="https://argmax.ai/images/iconified/apple-touch-icon-144x144.png" />
+		<link rel="apple-touch-icon" sizes="152x152" href="https://argmax.ai/images/iconified/apple-touch-icon-152x152.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="https://argmax.ai/images/iconified/apple-touch-icon-180x180.png" />
+
+
+  <meta property="og:title" content="How to Learn Functions on Sets with Neural Networks - argmax.ai"/>
+    <meta property="og:image" content="https://argmax.ai/images/setinvariance/deep_sets_900_500.png"/>
+  <meta property="og:description" content="If you put a vector of data in a neural network, the order of the elements In this post, we will look into functions on sets, and how to learn them with the help of neural networks."/>
+  <meta property="og:url" content="https://argmax.ai/blog/setinvariance/" />
+
+
+
+    <meta name="tags" contents="set invariance" />
+    <meta name="tags" contents="aggregation" />
+
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+  <script src="https://argmax.ai/theme/js/custom.js"></script>
+
+
+	</head>
+	<body class="single">
+      <progress value="0"></progress>
+	<!-- Wrapper -->
+		<div id="wrapper">
+
+			<!-- Header -->
+				<header id="header">
+					<h1><a href="https://argmax.ai/">argmax.ai</a></h1>
+					<nav class="links">
+	
+						<ul>
+							<li><a href="https://argmax.ai/papers">Papers</a></li>
+
+							<li><a href="https://argmax.ai/blog/">blog</a></li>
+							<li><a href="https://argmax.ai/ml-course/">ml course</a></li>
+							<li><a href="https://argmax.ai/talks/">talks</a></li>
+							<li><a href="https://argmax.ai/team/">team</a></li>
+
+						</ul>
+
+					</nav>
+					
+					<nav class="main">
+						<ul>
+							<!-- Social -->
+
+							<li class="menu">
+								<a class="fa-edit" href="https://gitlab.com/-/ide/project/argmax-ai/misc/argmax_blog_source/edit/master/-/content/blog/2019-10-16_setinvariance.md">Edit</a>
+							</li>
+
+							<li class="search">
+								<a class="fa-search" href="#search">Search</a>
+								<form id="search" method="get" action="https://argmax.ai/search.html">
+									<input type="text" name="q" placeholder="Search" id="tipue_search_input" autocomplete="off" required />
+								</form>
+							</li>
+							<li class="menu">
+								<a class="fa-bars" href="#menu">Menu</a>
+							</li>
+						</ul>
+					</nav>
+				</header>
+
+			<!-- Menu -->
+<section id="menu">
+
+  <!-- Search -->
+    <section>
+      <form class="search" method="get" action="https://argmax.ai/search.html">
+        <input type="text" name="q" id="tipue_search_input" placeholder="Search" autocomplete="off" required />
+      </form>
+    </section>
+
+  <!-- Links -->
+    <section>
+      <ul class="links">
+
+
+
+        <li>
+          <a href="https://argmax.ai/papers">
+            <h3>Papers</h3>
+<p>Our latest publications</p>          </a>
+        </li>
+
+        <li>
+          <a href="https://argmax.ai/blog/">
+            <h3>blog</h3>
+<p>Implementations, papers, opinions, etc.</p>          </a>
+        </li>
+        <li>
+          <a href="https://argmax.ai/ml-course/">
+            <h3>ml course</h3>
+<p>Video lectures and slides on Machine Learning</p>          </a>
+        </li>
+        <li>
+          <a href="https://argmax.ai/talks/">
+            <h3>talks</h3>
+<p>Open scientific talks</p>          </a>
+        </li>
+        <li>
+          <a href="https://argmax.ai/team/">
+            <h3>team</h3>
+<p>The whole crew</p>          </a>
+        </li>
+
+
+      </ul>
+    </section>
+
+  <!-- Social -->
+
+<!-- 
+    <section>
+      <ul class="align-center actions horizontal">
+        <li><a href="None" class="icon fa-feed"><span class="label">RSS</span></a></li>
+      </ul>
+    </section>
+ -->
+
+  <!-- Actions -->
+<!--  -->
+    <section>
+      <ul class="actions vertical">
+        <li><a href="https://argmax.ai/about" class="button big fit">About</a></li>
+      </ul>
+    </section>
+
+</section>
+			<!-- Main -->
+<div id="main">
+  <article class="post">
+    <header>
+      <div class="title">
+        <h2>
+        How to Learn Functions on Sets with Neural Networks
+        </h2>
+        <p>And how to choose your aggregation</p>
+      </div>
+      <div class="meta">
+        <time class="published" datetime="2019-10-16T00:00:00+02:00">16 October 2019</time>
+
+
+
+        <a class="author" href="https://argmax.ai/team/maximilian-soelch">
+        <span class="name">Maximilian Soelch</span>
+        <img src="https://argmax.ai/images/avatars/maxs.png" alt="" />
+        </a>
+      </div>
+    </header>
+
+    <figure class="cap-left">
+    <img class="image featured" src="https://argmax.ai/images/setinvariance/deep_sets_900_500.png" alt="" />
+        <figcaption>
+          The basic Deep Sets architecture for set functions: embed, aggregate, process.
+        </figcaption>
+    </figure>
+     
+    <p >
+        <!-- PELICAN_END_SUMMARY -->
+
+<p>In this post we look into <em>functions on sets</em>, and how to learn them with the help of neural networks. As it turns out, set-valued inputs pose unique challenges to our neural architectures, so let us begin by trying to understand the fundamental differences.</p>
+<p>In your common machine-learning task, you are given a data set <span class="math">\(\mathcal D\)</span>. Your data set may contain pairs of inputs <span class="math">\(x_i \in \mathcal X\)</span> and outputs <span class="math">\(y_i \in \mathcal Y\)</span>. Part of the popularity of neural networks is that they excel in adapting to a huge variety of input domains <span class="math">\(\mathcal X\)</span>. In this, there is an implicit assumption so common that we hardly question it in a generic neural application: all inputs <span class="math">\(x_i\)</span> should have the same fixed size, e.g., a vector from some space <span class="math">\(\mathbb R^d\)</span>.</p>
+<p>Set-valued inputs do not allow for that.  Each input is a set&mdash;which we will call <em>population</em>. The elements of a population&mdash;its <em>particles</em>&mdash;have a fixed size, but the entire population size may vary. Feed-forward neural networks, expecting fixed-size input, are not equipped for this task.</p>
+<p>There is, however, a class of neural networks than can handle variable-length inputs: recurrent nets. By interpreting a population as a sequence of particles, we could make use of RNNs to process set-valued. Unfortunately, this ignores a fundamental property of sets: they are unordered. To process them with RNNs, we have to impose some (likely arbitrary) order on the set. As <a href='#vinyals_order_2015-1' id='ref-vinyals_order_2015-1-1'>Vinyals et al. (2015)</a> have shown, the output of the RNN is highly dependent on the order of inputs. This is undesirable for proper functions on sets.</p>
+<p>In short, we are looking for a learnable architecture that</p>
+<ol>
+<li>is able to process input populations of variable size, and</li>
+<li>produces outputs <em>invariant</em> to any particular order of the particles in the population.</li>
+</ol>
+<p>Interestingly, it has been shown (<a href='#zaheer_deep_2017' id='ref-zaheer_deep_2017-1'>Zaheer et al. (2017)</a>, refined by <a href='#wagstaff_limitations_2019' id='ref-wagstaff_limitations_2019-1'>Wagstaff et al. (2019)</a>) that a set function <span class="math">\(f\)</span>, under mild assumptions, can be decomposed as
+</p>
+<div class="math">$$
+f(\mathcal X) = \rho\left(\sum_{x\in X} \phi(x)\right).
+$$</div>
+<p>Let us take this apart. Any invariant function can be constructed using the same simple recipe: embed each particle individually with <span class="math">\(\phi\)</span>, aggregate the embeddings into an invariant, fixed-size description of the set by summing the embeddings, and then process the aggregate description with <span class="math">\(\rho\)</span>. The generic architecture is depicted below:</p>
+<figure class="cap-left">    
+  <img class="image fit" src='https://argmax.ai/images/setinvariance/deep_sets.png' alt='Deep Sets'>
+  <figcaption> 
+    The basic Deep Sets architecture for set functions: embed a population <i>X</i> into memory <i>M</i>, aggregate the memory into <i>a</i>, process a to obtain the final result <i>r</i>.
+  </figcaption>
+</figure>
+
+<p>In this formulation, neither <span class="math">\(\phi\)</span> nor <span class="math">\(\rho\)</span> operate on a set. This immediately allows us to plug in function approximators like neural networks for both&mdash;a neural architecture that is invariant by design, the <em>Deep Sets</em> framework.</p>
+<p>Let us take a closer look at the aggregation step. It is interesting from at least two perspectives: on the one hand, it is the crucial step for inducing invariance to any ordering of the particles in the population. The summation negates the identities of individual particles. On the other hand, despite its importance, and despite seeing alternatives like mean or max being used instead of summation in the literature, it is the only non-learnable part in the Deep Sets framework.</p>
+<h1 id="our-contributions">Our Contributions</h1>
+<p>In our paper <a href="https://arxiv.org/abs/1903.07348"><em>On Deep Set Learning and the Choice of Aggregations</em></a> <a href='#soelch_deep_2019' id='ref-soelch_deep_2019-1'>(Soelch et al., 2019)</a>, we examine its role in more depth.</p>
+<p>On the theoretical side, we show that a broader class of aggregation functions are also applicable without breaking the theoretical decomposition result, for example mean or also <a href="https://www.xarg.org/2016/06/the-log-sum-exp-trick-in-machine-learning/">logsumexp</a>. We call this class of functions <em>sum-isomorphic</em>, because they act like a sum in a space isomorphic to <span class="math">\(\mathcal X\)</span>. This is interesting because they are numerically favorable over sum: their result does not scale linearly with the number of set elements. For mean aggregations, the activation will be on the same order of magnitude across any population size. A particular case can be made for logsumexp, as it exhibits <em>diminishing returns</em>: the gain from an additional particle diminishes with increasing population size. Moreover, depending on the scale of inputs, logsumexp can behave more like a linear function (for smaller values) or like max (for larger values).</p>
+<p>Moreover, we suggest <em>recurrent, learnable aggregations</em>, an aggregation function inspired by the architecture suggested by <a href='#vinyals_order_2015-1' id='ref-vinyals_order_2015-1-2'>Vinyals et al. (2015)</a>. The idea is to learn an aggregation that dynamically queries the particle embeddings. Each subsequent query <span class="math">\(q_t\)</span> depends on the response <span class="math">\(a_{t-1}\)</span> of the embeddings to the previous query <span class="math">\(q_{t-1}\)</span>. This procedure is depicted below.</p>
+<figure class="cap-left">    
+  <img class="image fit" src='https://argmax.ai/images/setinvariance/recurrent_aggregation.png' alt='Recurrent Aggregation'>
+  <figcaption> 
+    A learnable, recurrent aggregation function. The recurrent cell implements a loop of queries <i>q</i> and responses <i>a</i> to the embedded memory <i>M</i>.
+  </figcaption>
+</figure>
+
+<p>Since each query-response cycle is invariant, the overall procedure is invariant. Lastly, we process all responses in backward order, so that the first query and its response have the most immediate effect on the result of the recurrent aggregation.</p>
+<p>On the empirical side, across a number of different experiments, we find a number of interesting results to be considered in future experiments on set-valued inputs:</p>
+<ol>
+<li>Aggregation functions matter: the choice of aggregation function, even if not learned, can have a crucial impact on the overall performance.</li>
+<li>The application matters: which aggregation function to use largely depends on the task at hand. As a general guideline, we found that classification tasks benefit from using max-aggregation, while smoother aggregations tended to work significantly better for regression tasks.</li>
+<li>The population size is understudied: for simplicity, Deep Sets networks are often trained with a fixed population size. We found that this can lead to overfitting for populations of that particular size, and much decreased performance for <em>both smaller and larger</em> populations. In a typical application, where the population size may vary at inference time, a more desired behavior would be a monotonic increase of performance in the population size, akin to asymptotic consistency of statistical estimators.</li>
+<li>Learnable aggregations can make your model more robust to such effects.</li>
+</ol>
+<p>We are only beginning to understand the design and learning process of neural set architectures. Our paper will help you selecting appropriate aggregation functions by offering a wider selection of applicable aggregations and empirical results to inform the decision.</p>
+<p><em>This work was published at the International Conference on Artificial Neural Networks (ICANN), 2019, in Munich. We refer to the paper for a more detailed discussion: <a href="https://doi.org/10.1007/978-3-030-30487-4_35">DOI</a>, <a href="https://arxiv.org/abs/1903.07348">preprint</a>.</em></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%&#64;#$&#64;#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%&#64;#$&#64;#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script><hr>
+<h2>Bibliography</h2>
+<p id='soelch_deep_2019'>Maximilian Soelch, Adnan Akhundov, Patrick <span class="bibtex-protected">van der Smagt</span>, and Justin Bayer.
+On <span class="bibtex-protected"><span class="bibtex-protected">Deep Set Learning</span></span> and the <span class="bibtex-protected"><span class="bibtex-protected">Choice</span></span> of <span class="bibtex-protected"><span class="bibtex-protected">Aggregations</span></span>.
+In Igor&nbsp;V. Tetko, V<span class="bibtex-protected">ě</span>ra K<span class="bibtex-protected"><span class="bibtex-protected">ů</span></span>rkov<span class="bibtex-protected">á</span>, Pavel Karpov, and Fabian Theis, editors, <em>Artificial <span class="bibtex-protected"><span class="bibtex-protected">Neural Networks</span></span> and <span class="bibtex-protected"><span class="bibtex-protected">Machine Learning</span></span> – <span class="bibtex-protected"><span class="bibtex-protected">ICANN</span></span> 2019: <span class="bibtex-protected"><span class="bibtex-protected">Theoretical Neural Computation</span></span></em>, Lecture <span class="bibtex-protected"><span class="bibtex-protected">Notes</span></span> in <span class="bibtex-protected"><span class="bibtex-protected">Computer Science</span></span>, 444&ndash;457. <span class="bibtex-protected">Springer International Publishing</span>, 2019.
+URL: <a href="https://arxiv.org/abs/1903.07348">https://arxiv.org/abs/1903.07348</a>. <a class="cite-backref" href="#ref-soelch_deep_2019-1" title="Jump back to reference 1">↩</a></p>
+<p id='vinyals_order_2015-1'>Oriol Vinyals, Samy Bengio, and Manjunath Kudlur.
+Order <span class="bibtex-protected"><span class="bibtex-protected">Matters</span></span>: <span class="bibtex-protected"><span class="bibtex-protected">Sequence</span></span> to sequence for sets.
+<em>arXiv:1511.06391 [cs, stat]</em>, November 2015.
+URL: <a href="http://arxiv.org/abs/1511.06391">http://arxiv.org/abs/1511.06391</a>, <a href="https://arxiv.org/abs/1511.06391">arXiv:1511.06391</a>. <a class="cite-backref" href="#ref-vinyals_order_2015-1-1" title="Jump back to reference 1">↩</a><a class="cite-backref" href="#ref-vinyals_order_2015-1-1" title="Jump back to reference 1"> <sup>1</sup> </a><a class="cite-backref" href="#ref-vinyals_order_2015-1-2" title="Jump back to reference 2"><sup>2</sup> </a></p>
+<p id='wagstaff_limitations_2019'>Edward Wagstaff, Fabian&nbsp;B. Fuchs, Martin Engelcke, Ingmar Posner, and Michael Osborne.
+On the <span class="bibtex-protected"><span class="bibtex-protected">Limitations</span></span> of <span class="bibtex-protected"><span class="bibtex-protected">Representing Functions</span></span> on <span class="bibtex-protected"><span class="bibtex-protected">Sets</span></span>.
+<em>arXiv:1901.09006 [cs, stat]</em>, January 2019.
+URL: <a href="http://arxiv.org/abs/1901.09006">http://arxiv.org/abs/1901.09006</a>, <a href="https://arxiv.org/abs/1901.09006">arXiv:1901.09006</a>. <a class="cite-backref" href="#ref-wagstaff_limitations_2019-1" title="Jump back to reference 1">↩</a></p>
+<p id='zaheer_deep_2017'>Manzil Zaheer, Satwik Kottur, Siamak Ravanbakhsh, Barnabas Poczos, Ruslan&nbsp;R Salakhutdinov, and Alexander&nbsp;J Smola.
+Deep <span class="bibtex-protected"><span class="bibtex-protected">Sets</span></span>.
+In I.&nbsp;Guyon, U.&nbsp;V. Luxburg, S.&nbsp;Bengio, H.&nbsp;Wallach, R.&nbsp;Fergus, S.&nbsp;Vishwanathan, and R.&nbsp;Garnett, editors, <em>Advances in <span class="bibtex-protected"><span class="bibtex-protected">Neural Information Processing Systems</span></span> 30</em>, pages 3391–3401.
+<span class="bibtex-protected">Curran Associates, Inc.</span>, 2017.
+URL: <a href="http://papers.nips.cc/paper/6931-deep-sets.pdf">http://papers.nips.cc/paper/6931-deep-sets.pdf</a>. <a class="cite-backref" href="#ref-zaheer_deep_2017-1" title="Jump back to reference 1">↩</a></p>
+
+    </p>
+
+    <footer>
+      <ul class="stats">
+        <!-- <li id='article_category'><a href="https://argmax.ai/blog/">blog</a></li> -->
+
+
+          <li><a target="_blank" href='mailto:?subject=Sharing a post from argmax.ai&body=Check out this post I came across "How to Learn Functions on Sets with Neural Networks" at https://argmax.ai/blog/setinvariance/"' class="icon fa-envelope">Email</a></li>
+          <li><a target="_blank" href='http://twitter.com/intent/tweet?status=How to Learn Functions on Sets with Neural Networks+https://argmax.ai/blog/setinvariance/' class="icon fa-twitter">Twitter</a></li>
+          <li><a target="_blank" href='http://www.reddit.com/submit?url=https://argmax.ai/blog/setinvariance/&title=How to Learn Functions on Sets with Neural Networks' class="icon fa-reddit">Reddit</a></li>
+          <li><a target="_blank" href="http://www.linkedin.com/shareArticle?mini=true&url=https://argmax.ai/blog/setinvariance/&title=How to Learn Functions on Sets with Neural Networks&source=https://argmax.ai" class="icon fa-linkedin">LinkedIn</a></li>
+          <li><a target="_blank" href='https://news.ycombinator.com/submitlink?t=How to Learn Functions on Sets with Neural Networks&u=https://argmax.ai/blog/setinvariance/' class="icon fa-hacker-news">HackerNews</a></li>
+
+      </ul>
+    </footer>
+  </article>
+
+  <ul class="actions pagination">
+
+        <li><a href="https://argmax.ai/blog/vhp-vae/" class="button previous">Learning Hierarchical Priors in VAEs</a></li>
+
+        <li><a href="https://argmax.ai/blog/geodesic/" class="button next">Approximate Geodesics for Deep Generative Models</a></li>
+  </ul>
+  
+</div>
+
+
+
+
+
+
+<div id="comments" class="comments">
+
+</div>
+
+<section id="footer">
+  <p class="copyright">&copy; argmax.ai  - <a href="https://argmax.ai//imprint">Imprint</a> - <a href="https://argmax.ai//data-protection">Data Protection</a> - <a href="https://argmax.ai//copyright">Copyright</a>
+</section><!-- <section id="footer">
+  <p class="copyright">&copy; argmax.ai. 
+  Powered by <a href="http://blog.getpelican.com/">Pelican</a>.</p>
+</section> -->
+		</div>
+
+	<!-- Scripts -->
+		<script src="https://argmax.ai/theme/js/skel.min.js"></script>
+		<script src="https://argmax.ai/theme/js/util.js"></script>
+		<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+		<script src="https://argmax.ai/theme/js/main.js"></script>
+
+	</body>
+</html>

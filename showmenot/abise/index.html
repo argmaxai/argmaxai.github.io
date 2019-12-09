@@ -1,0 +1,475 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+  
+		
+
+		<title>Approximate Bayesian Inference in Spatial Environments · argmax.ai</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+	
+		<link rel="stylesheet" href="https://argmax.ai/theme/css/main.css" />
+		<link rel="stylesheet" href="https://argmax.ai/theme/css/pygment.css" />
+		<link rel="stylesheet" href="https://argmax.ai/theme/css/custom.css" />
+		<!--[if lte IE 9]><link rel="stylesheet" href="https://argmax.ai/theme/css/ie9.css" /><![endif]-->
+		<!--[if lte IE 8]><link rel="stylesheet" href="https://argmax.ai/theme/css/ie8.css" /><![endif]-->
+
+
+		<style>
+		body {
+		    background: #fffaff;
+		}
+		</style>
+		
+
+
+		<script src="https://argmax.ai/theme/js/jquery.min.js"></script>
+
+
+		<link rel="shortcut icon" href="https://argmax.ai/images/iconified/favicon.ico" type="image/x-icon" />
+		<link rel="apple-touch-icon" href="https://argmax.ai/images/iconified/apple-touch-icon.png" />
+		<link rel="apple-touch-icon" sizes="57x57" href="https://argmax.ai/images/iconified/apple-touch-icon-57x57.png" />
+		<link rel="apple-touch-icon" sizes="72x72" href="https://argmax.ai/images/iconified/apple-touch-icon-72x72.png" />
+		<link rel="apple-touch-icon" sizes="76x76" href="https://argmax.ai/images/iconified/apple-touch-icon-76x76.png" />
+		<link rel="apple-touch-icon" sizes="114x114" href="https://argmax.ai/images/iconified/apple-touch-icon-114x114.png" />
+		<link rel="apple-touch-icon" sizes="120x120" href="https://argmax.ai/images/iconified/apple-touch-icon-120x120.png" />
+		<link rel="apple-touch-icon" sizes="144x144" href="https://argmax.ai/images/iconified/apple-touch-icon-144x144.png" />
+		<link rel="apple-touch-icon" sizes="152x152" href="https://argmax.ai/images/iconified/apple-touch-icon-152x152.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="https://argmax.ai/images/iconified/apple-touch-icon-180x180.png" />
+
+
+  <meta property="og:title" content="Approximate Bayesian Inference in Spatial Environments - argmax.ai"/>
+  <meta property="og:description" content="In this post, we will get familiar with a flexible probabilistic platform for spatial reasoning."/>
+  <meta property="og:url" content="https://argmax.ai/showmenot/abise/" />
+
+
+
+    <meta name="tags" contents="SLAM" />
+    <meta name="tags" contents="localization" />
+    <meta name="tags" contents="mapping" />
+    <meta name="tags" contents="navigation" />
+    <meta name="tags" contents="exploration" />
+
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+  <script src="https://argmax.ai/theme/js/custom.js"></script>
+
+
+	</head>
+	<body class="single">
+      <progress value="0"></progress>
+	<!-- Wrapper -->
+		<div id="wrapper">
+
+			<!-- Header -->
+				<header id="header">
+					<h1><a href="https://argmax.ai/">argmax.ai</a></h1>
+					<nav class="links">
+	
+						<ul>
+							<li><a href="https://argmax.ai/papers">Papers</a></li>
+
+							<li><a href="https://argmax.ai/blog/">blog</a></li>
+							<li><a href="https://argmax.ai/ml-course/">ml course</a></li>
+							<li><a href="https://argmax.ai/talks/">talks</a></li>
+							<li><a href="https://argmax.ai/team/">team</a></li>
+
+						</ul>
+
+					</nav>
+					
+					<nav class="main">
+						<ul>
+							<!-- Social -->
+
+							<li class="menu">
+								<a class="fa-edit" href="https://gitlab.com/-/ide/project/argmax-ai/misc/argmax_blog_source/edit/master/-/content/blog/2019-10-21_abise.md">Edit</a>
+							</li>
+
+							<li class="search">
+								<a class="fa-search" href="#search">Search</a>
+								<form id="search" method="get" action="https://argmax.ai/search.html">
+									<input type="text" name="q" placeholder="Search" id="tipue_search_input" autocomplete="off" required />
+								</form>
+							</li>
+							<li class="menu">
+								<a class="fa-bars" href="#menu">Menu</a>
+							</li>
+						</ul>
+					</nav>
+				</header>
+
+			<!-- Menu -->
+<section id="menu">
+
+  <!-- Search -->
+    <section>
+      <form class="search" method="get" action="https://argmax.ai/search.html">
+        <input type="text" name="q" id="tipue_search_input" placeholder="Search" autocomplete="off" required />
+      </form>
+    </section>
+
+  <!-- Links -->
+    <section>
+      <ul class="links">
+
+
+
+        <li>
+          <a href="https://argmax.ai/papers">
+            <h3>Papers</h3>
+<p>Our latest publications</p>          </a>
+        </li>
+
+        <li>
+          <a href="https://argmax.ai/blog/">
+            <h3>blog</h3>
+<p>Implementations, papers, opinions, etc.</p>          </a>
+        </li>
+        <li>
+          <a href="https://argmax.ai/ml-course/">
+            <h3>ml course</h3>
+<p>Video lectures and slides on Machine Learning</p>          </a>
+        </li>
+        <li>
+          <a href="https://argmax.ai/talks/">
+            <h3>talks</h3>
+<p>Open scientific talks</p>          </a>
+        </li>
+        <li>
+          <a href="https://argmax.ai/team/">
+            <h3>team</h3>
+<p>The whole crew</p>          </a>
+        </li>
+
+
+      </ul>
+    </section>
+
+  <!-- Social -->
+
+<!-- 
+    <section>
+      <ul class="align-center actions horizontal">
+        <li><a href="None" class="icon fa-feed"><span class="label">RSS</span></a></li>
+      </ul>
+    </section>
+ -->
+
+  <!-- Actions -->
+<!--  -->
+    <section>
+      <ul class="actions vertical">
+        <li><a href="https://argmax.ai/about" class="button big fit">About</a></li>
+      </ul>
+    </section>
+
+</section>
+			<!-- Main -->
+<div id="main">
+  <article class="post">
+    <header>
+      <div class="title">
+        <h2>
+        Approximate Bayesian Inference in Spatial Environments
+        </h2>
+        <p>How to Reason About Space and Moving Agents</p>
+      </div>
+      <div class="meta">
+        <time class="published" datetime="2019-10-21T00:00:00+02:00">21 October 2019</time>
+
+
+
+        <a class="author" href="https://argmax.ai/team/atanas-mirchev">
+        <span class="name">Atanas Mirchev</span>
+        <img src="https://argmax.ai/images/avatars/mirchev_mini.jpg" alt="" />
+        </a>
+      </div>
+    </header>
+
+     
+    <p >
+        <p>Space is all around us and it governs our actions every single day.
+That is why we keep trying to build physical systems (agents) that understand space.
+It is a lucrative prospect&mdash;spatially-aware machines can make decisions and appropriately interact with their surroundings.
+And that would let us offload some of our daily work to them.</p>
+<p>In today's blog post we will discuss a probabilistic platform designed with the above in mind.
+A spatially-aware agent needs to know where it is (localization) based on what it has seen before.
+It also needs to know the position of things around it (mapping).
+We will frame both of these as probabilistic inference.
+From there, we will solve two more tasks through the same unified model: navigating from point A to point B and exploring unseen environments.</p>
+<p><!--PELICAN_END_SUMMARY -->
+</p>
+<div class="math">$$
+\def\map{\boldsymbol{\mathcal{M}}}
+\def\pose{\mathbf{z}}
+\def\chart{\mathbf{m}}
+\def\obs{\mathbf{x}}
+\def\control{\mathbf{u}}
+\def\Ts{_{1:T}}
+\def\Tsm{_{1:T-1}}
+\def\t{_{t}}
+\def\tp{_{t + 1}}
+\def\tm{_{t - 1}}
+\def\genpars{\boldsymbol{\theta}}
+\def\varpars{\boldsymbol{\phi}}
+\def\loss{\mathcal{L}}
+\def\expc{\mathbb{E}}
+\def\kl{\text{KL}}
+\def\gauss{\mathcal{N}}
+\def\mean{\boldsymbol{\mu}}
+\def\stddev{\boldsymbol{\sigma}}
+$$</div>
+<h1 id="probabilistic-localization-and-mapping">Probabilistic localization and mapping</h1>
+<p>The task of <em>Simultaneous Localization and Mapping</em> (SLAM), first coined by <a href='#durrant1996localization' id='ref-durrant1996localization-1'>DurrantWhyte et al. (1996)</a>, makes up the first part of our problem.
+Imagine the following setup: over time, an agent is moving about and observing its surroundings.
+It is recording what it sees in a sequence <span class="math">\(\obs\Ts\)</span>.
+For example, camera images or laser distance measurements.
+The agent needs to figure out its own poses over time <span class="math">\(\pose\Ts\)</span> and a global world map <span class="math">\(\map\)</span>.
+It has to do so solely by looking at the history of observations <span class="math">\(\obs\Ts\)</span>.</p>
+<p>SLAM can be defined as a probabilistic inference problem.
+To do this, we treat <span class="math">\(\obs\Ts, \pose\Ts\)</span> and <span class="math">\(\map\)</span> as random variables.
+The goal is to find the posterior:
+</p>
+<div class="math">$$
+p(\pose\Ts, \map \mid \obs\Ts).
+$$</div>
+<p>
+Framing the problem in a probabilistic manner is advantageous.
+For once, the framework is extensible&mdash;in the future we can add more interesting variables and infer them just like <span class="math">\(\pose\Ts\)</span> and <span class="math">\(\map\)</span>.
+We can also pose additional objectives based on uncertainty estimates&mdash;we can define robust methods; this is also how we define exploration below.</p>
+<h1 id="in-pursuit-of-better-models-our-objective">In pursuit of better models: our objective</h1>
+<p>SLAM models consist of multiple components, or functions: modelling how an agent moves with <span class="math">\(\pose\tp = f(\pose\t)\)</span>, modelling how an observation <span class="math">\(\obs_t\)</span> would be generated with <span class="math">\(\obs\t = f(\pose\t,\map)\)</span>, etc.
+In traditional implementations, an engineer must specify these functions relying on their understanding.
+Also the functions are often linearized to simplify the model and ensure tractability (using Kalman filters).</p>
+<p>There is an alternative, however: instead of engineering everything by hand, we can learn the model components from data.
+We've seen a surge of research that utilizes deep learning to good effect when modelling the real world. 
+The hope is that, with sufficient data, we can obtain learned models more optimal than what we could devise manually.</p>
+<p>The probabilistic framework we will present next aims to provide the following improvements:</p>
+<ul>
+<li>Straightforward integration of deep priors learned from data.</li>
+<li>Optimization using <em>stochastic gradient variational Bayes</em> (SGVB) <a href='#kingma2014auto' id='ref-kingma2014auto-1'>(Kingma and Welling, 2014)</a> which alleviates the need for linearized Gaussian models.</li>
+</ul>
+<h1 id="method">Method</h1>
+<p><img class="image right" src="https://argmax.ai/images/abise/pgm.png">
+Let us start by defining the components of our model. You can refer to the probabilistic graphical model on the right, too.</p>
+<h4 id="map">Map</h4>
+<p>The map <span class="math">\(\map\)</span> is a random variable that should reflect the world.
+In the applications below we focus on 2D environments, so we model <span class="math">\(\map\)</span> as a two-dimensional grid of vector cells, leaving the extension to 3D for future work.</p>
+<h4 id="attention">Attention</h4>
+<p>We additionally identify a sequence of variables <span class="math">\(\chart\Ts\)</span>.
+We call <span class="math">\(\chart\Ts\)</span> <em>charts</em>, and they represent local chunks of content from <span class="math">\(\map\)</span>.
+They are shaped by an attention model <span class="math">\(p(\chart\t \mid \map, \pose\t)\)</span> that extracts content from <span class="math">\(\map\)</span> around the current agent pose <span class="math">\(\pose\t\)</span>.</p>
+<h4 id="emission">Emission</h4>
+<p>A neural network with parameters <span class="math">\(\genpars_E\)</span> then takes the chart <span class="math">\(\chart\t\)</span> as input and generates a reconstruction of the current observation <span class="math">\(\obs\t\)</span>.
+This forms the emission distribution <span class="math">\(p_{\genpars_E}(\obs\t \mid \chart\t)\)</span>.</p>
+<h4 id="transition">Transition</h4>
+<p>The movement of the agent from time step <span class="math">\(t\)</span> to the next time step <span class="math">\(t + 1\)</span> is modelled by <span class="math">\(p_{\genpars_T}(\pose\tp \mid \pose\t, \control\t)\)</span>, where <span class="math">\(\control\t\)</span> is a control input.
+The transition is also a neural network with parameters <span class="math">\(\genpars_T\)</span>, similar to the emission model.</p>
+<p>The full joint distribution looks like this:
+</p>
+<div class="math">$$
+\begin{align}
+    &amp;p(\obs\Ts,\pose\Ts,\chart\Ts,\map)= p(\map) \rho(\pose_1)\\
+    &amp;\qquad \prod_{t=1}^T p_{\genpars_E}(\obs\t \mid \chart\t) \delta(\chart\t \mid \pose\t, \map) \prod_{t=1}^{T-1}p_{\genpars_T}(\pose\tp \mid \pose\t, \control\t).
+\end{align}
+$$</div>
+<p>How do we go about inference in this model?
+We opted in for complicated (but differentiable) functions for the attention, emission and transition, so analytical solutions are not easily available.
+We do not want to linearize either, as that would reduce the expressive power of the model.
+Luckily, we can use variational inference. Let's call the <em>Evidence Lower Bound</em> (ELBO) to the rescue:
+</p>
+<div class="math">$$
+\begin{align}
+&amp;\arg \max_{\varpars, \genpars} \loss(\varpars, \genpars) = \\
+&amp;\qquad \expc_{q}[\sum_{t=1}^T \log p_{\genpars_E}(\obs\t \mid \chart\t)] - \expc_{q}[\sum_{t=2}^T \kl(q_{\varpars}(\pose\t) \Vert p_{\genpars_T}(\pose\t \mid \pose\tm, \control\tm))] - \kl(q_{\varpars}(\map) \Vert p(\map)).
+\end{align}
+$$</div>
+<p>By maximizing the ELBO with respect to all model parameters, we are maximizing (a lower bound of) the log-probability of the sensor readings <span class="math">\(\obs\Ts\)</span> under the model assumptions.
+In so doing, we obtain a variational approximation <span class="math">\(q_{\varpars}(\pose\Ts, \map \mid \obs\Ts) \approx p_{\genpars}(\pose\Ts, \map \mid \obs\Ts)\)</span> of the desired posterior, i.e. we are SLAM-ing.
+Due to SGVB <a href='#kingma2014auto' id='ref-kingma2014auto-2'>(Kingma and Welling, 2014)</a>, we can do this with <em>Stochastic Gradient Descent</em> (SGD).
+Intuitively, the gradients that flow into <span class="math">\(\map\)</span> write content that makes the observations <span class="math">\(\obs\Ts\)</span> probable.
+Similarly, the poses <span class="math">\(\pose\Ts\)</span> are optimized such that all <span class="math">\(\obs\Ts\)</span> agree with the current map <span class="math">\(q_{\varpars}(\map)\)</span>.
+You can refer to <a href='#mirchev2019approximate' id='ref-mirchev2019approximate-1'>(Mirchev et al., 2019)</a> for more details if you are interested.
+Note that the form of the map and attention described in the paper were chosen to illustrate the feasibility of the model in the selected 2D environments. They are by no means final, and we plan to extend them in future work.</p>
+<p>We call our model DVBF-LM, which stands for <em>Deep Variational Bayes Filter with a Latent Map</em>.</p>
+<h1 id="slam-in-dvbf-lm">SLAM in DVBF-LM</h1>
+<p>Enough with the theory&mdash;time to look at some examples.
+To do SLAM in DVBF-LM we get the approximate posterior <span class="math">\(q_{\varpars}(\map, \pose\Ts \mid \obs\Ts)\)</span>.
+Here is an example for what this looks like in VizDooM, a DooM simulator:</p>
+<figure class="cap-left">
+    <img src="https://argmax.ai/images/abise/vizdoom.gif" class="image fit">
+    <figcaption>
+        DVBF-LM inference in VizDoom.
+    </figcaption>
+</figure>
+
+<p>The agent is the VizDooM player.
+The observations are grayscale images from the player perspective.
+On the left, we compare the true player path against the mean of <span class="math">\(q(\pose\Ts \mid \obs\Ts)\)</span>, the DVBF-LM localization estimate.
+As you can see, the agent is aware of its own location and orientation with a small error margin at all times.
+DVBF-LM can also reconstruct the observed image at any time based on the learned map&mdash;you can see this on the right.
+After inference, our model becomes a simulator of the whole environment.
+So let's use that to our advantage!</p>
+<h1 id="metric-maps-for-navigation">Metric maps for navigation</h1>
+<p>Since DVBF-LM acts as a simulator, we can use it as a proxy for the real world to plan future actions.
+In the paper we show how the agent can autonomously navigate from one place in a maze to another.
+This is done through traditional planning algorithms applied on top of the DVBF-LM platform. :
+<figure class="cap-left">
+    <img src="https://argmax.ai/images/abise/navigation.gif" class="image fit">
+    <figcaption>
+        Constructing and executing a DVBF-LM navigation plan to reach the star target.
+    </figcaption>
+</figure>
+The example you see here is bidirectional Hybrid-A* search. On the left, a navigation plan  is first constructed based on the learned map.
+To make this possible, we learn a consistent metric map with the help of a pretrained transition prior (details in the manuscript).
+On the right, you see the plan executed in the real environment.
+The agent has never seen the actual maze map and has no access to its ground truth position in space.</p>
+<h1 id="when-does-uncertainty-matter">When does uncertainty matter?</h1>
+<p>Uncertainty is needed whenever we want to quantify confidence in the model estimates.
+But one other thing it is good for is driving the behavior of the agent, providing intrinsic motivation.
+In DVBF-LM we use this to promote the exploration of new, completely unseen environments.
+We select future controls <span class="math">\(\control\Tsm^*\)</span> that would maximize the information gained about the SLAM map. 
+In simple terms, we query the distributions over observations DVBF-LM would generate for <span class="math">\(\control\Tsm\)</span>&mdash;that would be <span class="math">\(p_{\genpars}(\obs\Ts \mid \control\Tsm)\)</span>, and then measure the <em>mutual information</em> between these and <span class="math">\(q_{\varpars}(\map)\)</span>:
+</p>
+<div class="math">$$
+    \control\Tsm^* = \arg \max_{\control\Tsm} I(\obs\Ts; \map | \control\Tsm).
+$$</div>
+<p>
+This would not be possible without a probabilistic model.</p>
+<figure class="cap-left">
+    <img src="https://argmax.ai/images/abise/exploration.gif" class="image fit">
+    <figcaption>
+        Exploration of an unknown maze using DVBF-LM.
+    </figcaption>
+</figure>
+
+<p>On the left you can see an agent equipped with laser range finders explore an unseen maze, gradually constructing a map. On the right, we mark the tiles the agent has already visited at least once. This lets us know how effective the exploration strategy is.</p>
+<h1 id="tldr">TL;DR</h1>
+<ul>
+<li>Localization and mapping can be done both in a fully-probabilistic way and without the need for linearization.</li>
+<li>We can incorporate learning, making the overall model more flexible.</li>
+<li>Maintaining a metric map estimate (as opposed to a completely abstract one) allows for downstream tasks in the same framework&mdash;for example, navigation.</li>
+<li>Map uncertainty is precious&mdash;we can use it for exploration.</li>
+</ul>
+<p>The described method is not without its problems - in its current form it is slower than traditional SLAM approaches. It also needs to be scaled to real 3D environments. But DVBF-LM is showing promise as a platform for spatial reasoning and we are excited to further advance this line of work.</p>
+<p>Stay tuned!</p>
+<p><em>This work was published at the Robotics: Science and Systems conference, 2019, in Freiburg. We refer to the paper for a more detailed discussion: <a href="https://doi.org/10.15607/RSS.2019.XV.083">DOI</a>, <a href="https://arxiv.org/abs/1805.07206">preprint</a>.</em></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%&#64;#$&#64;#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%&#64;#$&#64;#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script><hr>
+<h2>Bibliography</h2>
+<p id='durrant1996localization'>Hugh Durrant-Whyte, David Rye, and Eduardo Nebot.
+Localization of autonomous guided vehicles.
+In Georges Giralt and Gerhard Hirzinger, editors, <em>Robotics Research</em>, 613–625. London, 1996. Springer London. <a class="cite-backref" href="#ref-durrant1996localization-1" title="Jump back to reference 1">↩</a></p>
+<p id='kingma2014auto'><span class="bibtex-protected">Diederik P</span> Kingma and Max Welling.
+Auto-encoding variational bayes.
+In <em>Proceedings of the 2nd International Conference on Learning Representations (ICLR)</em>. 2014. <a class="cite-backref" href="#ref-kingma2014auto-1" title="Jump back to reference 1">↩</a><a class="cite-backref" href="#ref-kingma2014auto-1" title="Jump back to reference 1"> <sup>1</sup> </a><a class="cite-backref" href="#ref-kingma2014auto-2" title="Jump back to reference 2"><sup>2</sup> </a></p>
+<p id='mirchev2019approximate'>Atanas Mirchev, Baris Kayalibay, Maximilian Soelch, Patrick van&nbsp;der Smagt, and Justin Bayer.
+Approximate bayesian inference in spatial environments.
+In <em>Proceedings of Robotics: Science and Systems</em>. Freiburg im Breisgau, Germany, June 2019.
+<a href="https://doi.org/10.15607/RSS.2019.XV.083">doi:10.15607/RSS.2019.XV.083</a>. <a class="cite-backref" href="#ref-mirchev2019approximate-1" title="Jump back to reference 1">↩</a></p>
+
+    </p>
+
+    <footer>
+      <ul class="stats">
+        <!-- <li id='article_category'><a href="https://argmax.ai/blog/">blog</a></li> -->
+
+
+          <li><a target="_blank" href='mailto:?subject=Sharing a post from argmax.ai&body=Check out this post I came across "Approximate Bayesian Inference in Spatial Environments" at https://argmax.ai/showmenot/abise/"' class="icon fa-envelope">Email</a></li>
+          <li><a target="_blank" href='http://twitter.com/intent/tweet?status=Approximate Bayesian Inference in Spatial Environments+https://argmax.ai/showmenot/abise/' class="icon fa-twitter">Twitter</a></li>
+          <li><a target="_blank" href='http://www.reddit.com/submit?url=https://argmax.ai/showmenot/abise/&title=Approximate Bayesian Inference in Spatial Environments' class="icon fa-reddit">Reddit</a></li>
+          <li><a target="_blank" href="http://www.linkedin.com/shareArticle?mini=true&url=https://argmax.ai/showmenot/abise/&title=Approximate Bayesian Inference in Spatial Environments&source=https://argmax.ai" class="icon fa-linkedin">LinkedIn</a></li>
+          <li><a target="_blank" href='https://news.ycombinator.com/submitlink?t=Approximate Bayesian Inference in Spatial Environments&u=https://argmax.ai/showmenot/abise/' class="icon fa-hacker-news">HackerNews</a></li>
+
+      </ul>
+    </footer>
+  </article>
+
+  <ul class="actions pagination">
+
+      <li><a href="#" class="disabled button previous">Previous post</a></li>
+
+      <li><a href="#" class="disabled button next">Next post</a></li>
+  </ul>
+  
+</div>
+
+
+
+
+
+
+<div id="comments" class="comments">
+
+</div>
+
+<section id="footer">
+  <p class="copyright">&copy; argmax.ai  - <a href="https://argmax.ai//imprint">Imprint</a> - <a href="https://argmax.ai//data-protection">Data Protection</a> - <a href="https://argmax.ai//copyright">Copyright</a>
+</section><!-- <section id="footer">
+  <p class="copyright">&copy; argmax.ai. 
+  Powered by <a href="http://blog.getpelican.com/">Pelican</a>.</p>
+</section> -->
+		</div>
+
+	<!-- Scripts -->
+		<script src="https://argmax.ai/theme/js/skel.min.js"></script>
+		<script src="https://argmax.ai/theme/js/util.js"></script>
+		<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+		<script src="https://argmax.ai/theme/js/main.js"></script>
+
+	</body>
+</html>

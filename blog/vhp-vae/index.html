@@ -1,0 +1,634 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+  
+		
+
+		<title>Learning Hierarchical Priors in VAEs · argmax.ai</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+	
+		<link rel="stylesheet" href="https://argmax.ai/theme/css/main.css" />
+		<link rel="stylesheet" href="https://argmax.ai/theme/css/pygment.css" />
+		<link rel="stylesheet" href="https://argmax.ai/theme/css/custom.css" />
+		<!--[if lte IE 9]><link rel="stylesheet" href="https://argmax.ai/theme/css/ie9.css" /><![endif]-->
+		<!--[if lte IE 8]><link rel="stylesheet" href="https://argmax.ai/theme/css/ie8.css" /><![endif]-->
+
+
+		<style>
+		body {
+		    background: #fffaff;
+		}
+		</style>
+		
+
+
+		<script src="https://argmax.ai/theme/js/jquery.min.js"></script>
+
+
+		<link rel="shortcut icon" href="https://argmax.ai/images/iconified/favicon.ico" type="image/x-icon" />
+		<link rel="apple-touch-icon" href="https://argmax.ai/images/iconified/apple-touch-icon.png" />
+		<link rel="apple-touch-icon" sizes="57x57" href="https://argmax.ai/images/iconified/apple-touch-icon-57x57.png" />
+		<link rel="apple-touch-icon" sizes="72x72" href="https://argmax.ai/images/iconified/apple-touch-icon-72x72.png" />
+		<link rel="apple-touch-icon" sizes="76x76" href="https://argmax.ai/images/iconified/apple-touch-icon-76x76.png" />
+		<link rel="apple-touch-icon" sizes="114x114" href="https://argmax.ai/images/iconified/apple-touch-icon-114x114.png" />
+		<link rel="apple-touch-icon" sizes="120x120" href="https://argmax.ai/images/iconified/apple-touch-icon-120x120.png" />
+		<link rel="apple-touch-icon" sizes="144x144" href="https://argmax.ai/images/iconified/apple-touch-icon-144x144.png" />
+		<link rel="apple-touch-icon" sizes="152x152" href="https://argmax.ai/images/iconified/apple-touch-icon-152x152.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="https://argmax.ai/images/iconified/apple-touch-icon-180x180.png" />
+
+
+  <meta property="og:title" content="Learning Hierarchical Priors in VAEs - argmax.ai"/>
+    <meta property="og:image" content="https://argmax.ai/images/vhp-vae/cover.gif"/>
+  <meta property="og:description" content="We address the issue of learning informative latent representations of data. In the normal VAE, the latent space prior is a standard normal distribution. This over-regularises the posterior distribution, resulting in latent representations that do not represent well the structure of the data. This post, describing our 2019 NeurIPS publication, proposes and demonstrates a solution by using an hierarchical latent space prior."/>
+  <meta property="og:url" content="https://argmax.ai/blog/vhp-vae/" />
+
+
+
+    <meta name="tags" contents="Variational Autoencoder" />
+    <meta name="tags" contents="Empirical Bayes" />
+    <meta name="tags" contents="Constrained Optimisation" />
+
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+  <script src="https://argmax.ai/theme/js/custom.js"></script>
+
+
+	</head>
+	<body class="single">
+      <progress value="0"></progress>
+	<!-- Wrapper -->
+		<div id="wrapper">
+
+			<!-- Header -->
+				<header id="header">
+					<h1><a href="https://argmax.ai/">argmax.ai</a></h1>
+					<nav class="links">
+	
+						<ul>
+							<li><a href="https://argmax.ai/papers">Papers</a></li>
+
+							<li><a href="https://argmax.ai/blog/">blog</a></li>
+							<li><a href="https://argmax.ai/ml-course/">ml course</a></li>
+							<li><a href="https://argmax.ai/talks/">talks</a></li>
+							<li><a href="https://argmax.ai/team/">team</a></li>
+
+						</ul>
+
+					</nav>
+					
+					<nav class="main">
+						<ul>
+							<!-- Social -->
+
+							<li class="menu">
+								<a class="fa-edit" href="https://gitlab.com/-/ide/project/argmax-ai/misc/argmax_blog_source/edit/master/-/content/blog/2019-12-02_vhp-vae.md">Edit</a>
+							</li>
+
+							<li class="search">
+								<a class="fa-search" href="#search">Search</a>
+								<form id="search" method="get" action="https://argmax.ai/search.html">
+									<input type="text" name="q" placeholder="Search" id="tipue_search_input" autocomplete="off" required />
+								</form>
+							</li>
+							<li class="menu">
+								<a class="fa-bars" href="#menu">Menu</a>
+							</li>
+						</ul>
+					</nav>
+				</header>
+
+			<!-- Menu -->
+<section id="menu">
+
+  <!-- Search -->
+    <section>
+      <form class="search" method="get" action="https://argmax.ai/search.html">
+        <input type="text" name="q" id="tipue_search_input" placeholder="Search" autocomplete="off" required />
+      </form>
+    </section>
+
+  <!-- Links -->
+    <section>
+      <ul class="links">
+
+
+
+        <li>
+          <a href="https://argmax.ai/papers">
+            <h3>Papers</h3>
+<p>Our latest publications</p>          </a>
+        </li>
+
+        <li>
+          <a href="https://argmax.ai/blog/">
+            <h3>blog</h3>
+<p>Implementations, papers, opinions, etc.</p>          </a>
+        </li>
+        <li>
+          <a href="https://argmax.ai/ml-course/">
+            <h3>ml course</h3>
+<p>Video lectures and slides on Machine Learning</p>          </a>
+        </li>
+        <li>
+          <a href="https://argmax.ai/talks/">
+            <h3>talks</h3>
+<p>Open scientific talks</p>          </a>
+        </li>
+        <li>
+          <a href="https://argmax.ai/team/">
+            <h3>team</h3>
+<p>The whole crew</p>          </a>
+        </li>
+
+
+      </ul>
+    </section>
+
+  <!-- Social -->
+
+<!-- 
+    <section>
+      <ul class="align-center actions horizontal">
+        <li><a href="None" class="icon fa-feed"><span class="label">RSS</span></a></li>
+      </ul>
+    </section>
+ -->
+
+  <!-- Actions -->
+<!--  -->
+    <section>
+      <ul class="actions vertical">
+        <li><a href="https://argmax.ai/about" class="button big fit">About</a></li>
+      </ul>
+    </section>
+
+</section>
+			<!-- Main -->
+<div id="main">
+  <article class="post">
+    <header>
+      <div class="title">
+        <h2>
+        Learning Hierarchical Priors in VAEs
+        </h2>
+        <p>A constrained optimisation approach</p>
+      </div>
+      <div class="meta">
+        <time class="published" datetime="2019-12-02T00:00:00+01:00">02 December 2019</time>
+
+
+
+        <a class="author" href="https://argmax.ai/team/alexej-klushyn">
+        <span class="name">Alexej Klushyn</span>
+        <img src="https://argmax.ai/images/avatars/alexej.jpg" alt="" />
+        </a>
+      </div>
+    </header>
+
+    <figure class="cap-left">
+    <img class="image featured" src="https://argmax.ai/images/vhp-vae/cover.gif" alt="" />
+        <figcaption>
+          Graph-based interpolation of human motions
+        </figcaption>
+    </figure>
+     
+    <p >
+        <p>Variational autoencoders (VAEs) <a href='#kingma2013' id='ref-kingma2013-1'>(Kingma and Welling, 2013)</a>, <a href='#rezende2014' id='ref-rezende2014-1'>(Rezende et al., 2014)</a> are a class of probabilistic latent-variable models for unsupervised learning and one of the models we base our work on. The idea behind the VAE is that the learned probabilistic model and the corresponding (approximate) posterior distribution of the latent variables provide a decoder/encoder pair that can capture semantically meaningful features of the data. </p>
+<p>In this blog post, we address the issue of learning informative latent representations/encodings.  In classifiable data, this may be representations that cluster according to some discrete features of the data. In regression data, important variations in data should be aligned with the axes of the latent space.</p>
+<p>The latent representation in a VAE is strongly influenced by the prior on those latent variables.  In the vanilla VAE, this prior is a standard normal distribution. This can be a limiting factor because it leads to over-regularising the posterior distribution, resulting in latent representations that do not represent well the structure of the data <a href='#2017arXiv171100464A' id='ref-2017arXiv171100464A-1'>(Alemi et al., 2018)</a>. Several methods have been proposed to alleviate this problem, including:</p>
+<ul>
+<li>using specialised optimisation algorithms that try to find local/global minima of the training objective that correspond to informative latent representations <a href='#K16-1002' id='ref-K16-1002-1'>(Bowman et al., 2016)</a>, <a href='#sonderby2016' id='ref-sonderby2016-1'>(Sonderby et al., 2016)</a>, <a href='#higgins2017beta' id='ref-higgins2017beta-1'>(Higgins et al., 2017)</a>, <a href='#rezende2018' id='ref-rezende2018-1'>(Rezende and Viola, 2018)</a>; </li>
+<li>or defining and learning complex prior distributions that can better model the encoded data manifold <a href='#Chen2016VariationalLA' id='ref-Chen2016VariationalLA-1'>(Chen et al., 2016)</a>, <a href='#tomczak2017' id='ref-tomczak2017-1'>(Tomczak and Welling, 2018)</a>. </li>
+</ul>
+<p>In the following, we will introduce a combination of these two approaches.</p>
+<h3 id="background-variational-autoencoders">Background: Variational Autoencoders</h3>
+<p>VAEs are a class of unsupervised learning methods, where we assume that the data <span class="math">\(\mathbf{x}\in \mathbb{R}^n\)</span> is generated by the probabilistic model
+</p>
+<div class="math">$$
+\begin{align}
+    p_{\theta}(\mathbf{x}) 
+    =
+    \int\! p_{\theta}(\mathbf{x} \vert\mathbf{z})\, p(\mathbf{z})\, \mathrm{d}\mathbf{z},
+\end{align}
+$$</div>
+<p>
+and the data <span class="math">\(\mathcal{D} = \{\mathbf{x}_i\}_{i=1}^N\)</span> is a set of identically distributed and independently generated data points.</p>
+<p>The model parameters <span class="math">\(\theta\)</span> are learned through amortised variational EM, which requires learning an approximate posterior distribution <span class="math">\(q_{\phi}(\mathbf{z} \vert \mathbf{x}_i) \approx p_{\theta}(\mathbf{z} \vert \mathbf{x}_i)\)</span>.  It is hoped that the learned <span class="math">\(q_{\phi}(\mathbf{z} \vert \mathbf{x})\)</span> and <span class="math">\(p_{\theta}(\mathbf{x} \vert \mathbf{z})\)</span> result in an informative latent representation of the data. For example, <span class="math">\(\{\mathbb{E}_{q_{\theta}(\mathbf{z} \vert \mathbf{x}_i)}[\mathbf{z}]\}_{i=1}^N\)</span> cluster w.r.t. some discrete features or important factors of variation in the data, which often lie along the axes (up to some rotation or linear transformation):</p>
+<p><img class="image fit" src="https://argmax.ai/images/vhp-vae/background_vae.png"></p>
+<p>The VAE is trained by minimising the evidence lower bound (ELBO) <a href='#kingma2013' id='ref-kingma2013-2'>(Kingma and Welling, 2013)</a>, <a href='#rezende2014' id='ref-rezende2014-2'>(Rezende et al., 2014)</a>
+</p>
+<div class="math">$$
+\begin{align}
+    \mathbb{E}_{p_\mathcal{D}(\mathbf{x})} \big[
+        \log p_{\theta}(\mathbf{x})
+    \big] 
+    \geq 
+    \mathcal{F}_\text{ELBO}(\theta, \phi)
+    \equiv
+    \mathop{\mathbb{E}_{p_\mathcal{D}(\mathbf{x})}} \Big[
+        \underbrace{
+            \mathbb{E}_{q_\phi(\mathbf{z}\vert\mathbf{x})} \big[
+                \log p_\theta(\mathbf{x}\vert\mathbf{z})
+            \big]
+        }_{
+            \mathrm{reconstruction}
+        }
+        -
+        \underbrace{
+            \mathrm{KL} \big(
+                q_\phi(\mathbf{z}\vert\mathbf{x})\|\,p(\mathbf{z})
+            \big)
+        }_{
+            \mathrm{KL~divergence}
+        }
+    \Big],
+\end{align}
+$$</div>
+<p>
+where <span class="math">\(q_{\phi}(\mathbf{z}\vert\mathbf{x})\)</span> and <span class="math">\(p_\theta(\mathbf{x}\vert\mathbf{z})\)</span> are typically assumed to be diagonal Gaussians with their parameters defined as neural network functions of the conditioning variables, and <span class="math">\({p_\mathcal{D}(\mathbf{x})=\frac{1}{N}\sum_{i=1}^{N}\delta(\mathbf{x}-\mathbf{x}_i)}\)</span> refers to the empirical distribution of the data <span class="math">\(\mathcal{D}\)</span>.</p>
+<h3 id="variational-autoencoders-as-a-constrained-optimisation-problem">Variational Autoencoders as a constrained optimisation problem</h3>
+<p>First of all: <strong>why constrained optimisation?</strong></p>
+<p>The advantage of constrained optimisation is that it allows us to introduce conditions, which have to be fulfilled when optimising an objective function. In the context of VAEs, this can become especially important when it comes to complicated neural network architectures or hierarchical graphical models <a href='#sonderby2016' id='ref-sonderby2016-2'>(Sonderby et al., 2016)</a>. The reason is: a low KL divergence is useless if the reconstruction fails.  We therefore want to control the reconstruction quality.</p>
+<p>To achieve this, <a href='#rezende2018' id='ref-rezende2018-2'>Rezende and Viola (2018)</a> proposed to formulate the learning problem as</p>
+<div class="math">$$
+\begin{align}
+    \min_\phi \,
+    \underbrace{
+        \mathbb{E}_{p_\mathcal{D}(\mathbf{x})} \big[
+            \mathop{\mathrm{KL} \big(
+                q_\phi(\mathbf{z}\vert\mathbf{x})\|\,p(\mathbf{z})
+            \big)}
+        \big]
+    }_{
+        \mathrm{optimisation~objective}
+    }
+    \quad \mathrm{s.t.} \quad
+    \underbrace{
+        \mathop{\mathbb{E}_{p_\mathcal{D}(\mathbf{x})}}
+        \mathbb{E}_{q_\phi(\mathbf{z}\vert\mathbf{x})} \big[ 
+            \text{C}_\theta(\mathbf{x}, \mathbf{z})
+        \big] 
+        \leq 
+        \kappa^2
+    }_{
+        \mathrm{inequality~constraint}
+    }.
+\end{align}
+$$</div>
+<p><span class="math">\({\text{C}_\theta(\mathbf{x}, \mathbf{z})}\)</span> is defined as the reconstruction error-related term in <span class="math">\({-\log  p_\theta(\mathbf{x}\vert\mathbf{z})}\)</span>. Thus, requiring the average reconstruction error to be lower or equal than <span class="math">\(\kappa^2\)</span>. For example, in case of fitting continuous data, the reconstruction error is the quadratic loss <span class="math">\(\text{C}_\theta(\mathbf{x}, \mathbf{z})=\vert\vert \mathbf{x}- g_\theta (\mathbf{z})\vert\vert^2\)</span> corresponding to a nonlinear conditional Gaussian likelihood model. The function <span class="math">\(g_\theta (\mathbf{z})\)</span> is the decoder mapping the latent space into the data space.</p>
+<p>The Lagrangian corresponding to the above optimisation problem is
+</p>
+<div class="math">$$
+\begin{align}
+    \mathcal{L}(\theta, \phi; \lambda)
+    \equiv
+    \mathop{\mathbb{E}_{p_\mathcal{D}(\mathbf{x})}} \Big[
+        \mathrm{KL} \big(
+            q_\phi(\mathbf{z}\vert\mathbf{x})\|\,p(\mathbf{z})
+        \big)
+        + 
+        \lambda \big( 
+            \mathop{\mathbb{E}_{q_\phi(\mathbf{z}\vert\mathbf{x})}} \big[
+                \text{C}_\theta(\mathbf{x}, \mathbf{z})
+            \big]
+            - 
+            \kappa^2
+        \big)
+    \Big],
+\end{align}
+$$</div>
+<p>
+and the learning is formulated as a saddle point optimisation of  <span class="math">\(\mathcal{L}(\theta, \phi; \lambda)\)</span> w.r.t. <span class="math">\((\theta, \phi)\)</span> and <span class="math">\(\lambda\)</span>.</p>
+<p>The main difference between <span class="math">\(\mathcal{L}(\theta, \phi; \lambda)\)</span> and <span class="math">\(\mathcal{F}_\text{ELBO}(\theta, \phi)\)</span> is the Lagrange multiplier <span class="math">\(\lambda\)</span>, which <em>weights</em> the inequality constraint. However, in general <span class="math">\(\mathcal{L}(\theta, \phi; \lambda)\)</span> can only be guaranteed to be the ELBO if <span class="math">\(\lambda=1\)</span>, or in case of <span class="math">\(0\leq\lambda&lt;1\)</span>, a scaled lower bound on the ELBO.</p>
+<p><strong>Note:</strong> in the classical constrained optimisation setting, constraints are not part of the objective function, and hence <span class="math">\(\theta\)</span> would not be optimised. Otherwise, the convexity of the optimisation problem cannot be guaranteed. Let's go a few steps back to resolve this lack of clarity: within the VAE framework, it is a common practice to optimise (<span class="math">\(\theta, \phi\)</span>) jointly. The original (EM) optimisation problem (e.g. <a href='#neal1998view' id='ref-neal1998view-1'>(Neal and Hinton, 1998)</a>), however, is formulated as
+</p>
+<div class="math">$$
+\begin{align}
+    \min_{\theta,\phi} 
+    -\mathcal{F}_\text{ELBO}(\theta,\phi) \:
+    \widehat{=} \,
+    \min_{\theta} 
+    \min_{\phi} 
+    -\mathcal{F}_\text{ELBO}(\theta, \phi).
+\end{align}
+$$</div>
+<p>
+This perspective allows us to interpret the optimisation problem as a sequence of Lagrangians:
+</p>
+<div class="math">$$
+\begin{align}
+    \overbrace{
+        \min_{\theta}
+    }^{
+        \mathrm{M\text{-}step}
+    } \:\:
+    \underbrace{
+        \max_{\lambda} \,
+        \min_{\phi}
+    }_{
+        \mathrm{E\text{-}step}
+    } \:\:\:
+    \mathcal{L}(\theta, \phi; \lambda) 
+    \quad \text{s.t.} \quad 
+    \lambda 
+    \geq 
+    0,
+\end{align}
+$$</div>
+<p>
+where <span class="math">\(\min_{\theta}\)</span> and <span class="math">\({\max_{\lambda} \min_{\phi} \mathcal{L}(\theta, \phi; \lambda)}\)</span> can be viewed as the corresponding steps of the original EM algorithm for training VAEs.</p>
+<h3 id="hierarchical-priors-for-learning-informative-latent-representations">Hierarchical priors for learning informative latent representations</h3>
+<p>As the next step, we introduce an empirical Bayes prior within the above constrained optimisation setting. Referring to the argument in the beginning, such flexible priors avoid over-regularising the posterior distribution, and hence allow to incentivise the learning of informative latent representations.</p>
+<p>It has been shown that the optimal empirical Bayes prior is the aggregated posterior distribution <span class="math">\(p^{\ast}(\mathbf{z}) = \mathbb{E}_{p_{\mathcal{D}}(\mathbf{x})}\big[q_{\phi}(\mathbf{z}\vert\mathbf{x})\big]\)</span> <a href='#tomczak2017' id='ref-tomczak2017-2'>(Tomczak and Welling, 2018)</a>. In order to express <span class="math">\(p^{\ast}(\mathbf{z})\)</span>, we use a continuous mixture/hierarchical model 
+</p>
+<div class="math">$$
+\begin{align}
+    p_\Theta(\mathbf{z}) 
+    = 
+    \int\! p_\Theta(\mathbf{z}\vert \mathbf{\zeta})\, p(\mathbf{\zeta})\, \mathrm{d}\mathbf{\zeta}
+\end{align}
+$$</div>
+<p>
+and learn the parameters by applying an importance-weighted lower bound <a href='#burda2015' id='ref-burda2015-1'>(Burda et al., 2015)</a> on
+</p>
+<div class="math">$$
+\begin{align}
+    \mathbb{E}_{p^{\ast}(\mathbf{z})} \big[
+        \log p(\mathbf{z})
+    \big]
+    =
+        \mathbb{E}_{p_\mathcal{D}(\mathbf{x})} 
+    \mathop{\mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})}}
+    \big[
+        \log p(\mathbf{z})
+    \big]
+    \geq
+    \mathbb{E}_{p_\mathcal{D}(\mathbf{x})} 
+    \mathop{\mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})}} \big[
+        \mathop{\mathcal{L}_\text{IW}(\Theta, \Phi; \mathbf{z})}
+    \big].
+\end{align}
+$$</div>
+<p>
+This introduces a new optimisation objective
+</p>
+<div class="math">$$
+\begin{align}
+    \mathbb{E}&amp;_{p_\mathcal{D}(\mathbf{x})} \big[
+        \mathop{\mathrm{KL} \big(
+            q_\phi(\mathbf{z}\vert\mathbf{x})\|\,p_\Theta(\mathbf{z})
+        \big)}
+    \big]
+    \leq 
+    \mathbb{E}_{p_\mathcal{D}(\mathbf{x})} \big[
+        \mathop{\mathcal{F}(\phi, \Theta, \Phi; \mathbf{x})}
+    \big]
+    \\
+    &amp;\equiv
+    \mathbb{E}_{p_\mathcal{D}(\mathbf{x})} 
+    \mathop{\mathbb{E}_{q_\phi(\mathbf{z}|\mathbf{x})}} \bigg[
+        \log q_\phi(\mathbf{z}\vert\mathbf{x}) 
+        -
+        \underbrace{
+            \mathop{\mathbb{E}_{\mathbf{\zeta}_{1:K}\sim q_\Phi(\mathbf{\zeta}|\mathbf{z})}} \Big[
+                \log\frac{1}{K}\sum_{k=1}^{K}\frac{p_\Theta(\mathbf{z},\mathbf{\zeta}_k)}{q_\Phi(\mathbf{\zeta}_k\vert\mathbf{z})}
+            \Big]
+        }_{
+            \mathcal{L}_\text{IW}(\Theta, \Phi; \mathbf{z})
+        }
+    \bigg],
+\end{align}
+$$</div>
+<p>
+where <span class="math">\(p(\mathbf{\zeta})\)</span> is a standard normal distribution and <span class="math">\(K\)</span> the number of importance weights. We refer to this approach as <em>variational hierarchical prior</em> (VHP). As a result, we arrive at the Lagrangian
+</p>
+<div class="math">$$
+\begin{align}
+    \mathcal{L}_\text{VHP}(\theta, \phi, \Theta, \Phi; \lambda)
+    \equiv
+    \mathop{\mathbb{E}_{p_\mathcal{D}(\mathbf{x})}} \Big[
+        \mathop{\mathcal{F}(\phi, \Theta, \Phi; \mathbf{x})}
+        + 
+        \lambda \big( 
+            \mathop{\mathbb{E}_{q_\phi(\mathbf{z}\vert\mathbf{x})}} \big[
+                \text{C}_\theta(\mathbf{x}, \mathbf{z})
+            \big]  
+            - 
+            \kappa^2 
+        \big)
+    \Big].
+\end{align}
+$$</div>
+<p>
+The constrained optimisation problem is formulated as
+</p>
+<div class="math">$$
+\begin{align}
+    \underbrace{
+    \min_{\Theta, \Phi}
+    }_{
+        {\substack{\mathrm{empirical}\\ \mathrm{Bayes}}}
+    } 
+    \overbrace{
+        \min_{\theta}
+    }^{
+        \mathrm{M\text{-}step}
+    } \:\:\,
+    \underbrace{
+        \max_{\lambda} \,
+        \min_{\phi}
+    }_{
+        \mathrm{E\text{-}step}
+    } \:\:\:
+    \mathcal{L}_\text{VHP}(\theta, \phi, \Theta, \Phi; \lambda)
+    \quad \text{s.t.} \quad
+    \lambda 
+    \geq 0,
+\end{align}
+$$</div>
+<p>
+which leads to the following double-loop method:</p>
+<ul>
+<li>in the <em>outer loop</em> we update the upper bound (empirical Bayes) w.r.t. <span class="math">\((\Theta, \Phi)\)</span>;</li>
+<li>in the <em>inner loop</em> we solve the original constrained optimisation problem w.r.t. <span class="math">\({(\theta, \lambda,  \phi)}\)</span>. </li>
+</ul>
+<p>The Lagrange multiplier <span class="math">\(\lambda\)</span> is updated by a quasi-gradient ascent. The update step is defined so that it finishes at <span class="math">\(\lambda = 1\)</span>, in order to optimise the ELBO at the end of the training. For more details regarding the <span class="math">\(\lambda\)</span> update scheme and the optimisation algorithm, we would like to refer to our <a href="https://arxiv.org/abs/1905.04982">paper</a> which is published at NeurIPS 2019.</p>
+<p>Our proposed method, which is a combination of an ELBO-like Lagrangian and an importance-weighted bound on the optimal empirical Bayes log-prior distribution, can be interpreted as follows: </p>
+<ul>
+<li>the posterior of the first stochastic layer <span class="math">\(q_\phi(\mathbf{z}|\mathbf{x})\)</span> can learn an informative latent representation due to the flexible prior;</li>
+<li>in order to express the flexible prior, we use a hierarchical mode and learn the parameters by applying an importance-weighted lower bound on <span class="math">\(\mathbb{E}_{p^{\ast}(\mathbf{z})} \big[\log p(\mathbf{z})\big]\)</span>. </li>
+</ul>
+<p>Despite a diagonal Gaussian <span class="math">\(q_\Phi(\mathbf{\zeta}\vert \mathbf{z})\)</span>, the importance weighting allows to learn a precise conditional <span class="math">\(p_\Theta(\mathbf{z}\vert\mathbf{\zeta})\)</span> from the standard normal distribution <span class="math">\(p(\mathbf{\zeta})\)</span> to the aggregated posterior <span class="math">\(\mathbb{E}_{p_{\mathcal{D}}(\mathbf{x})}[q_{\phi}(\mathbf{z}\vert\mathbf{x})]\)</span> <a href='#cremer2017' id='ref-cremer2017-1'>(Cremer et al., 2017)</a>. Alternatively, one could use, for example, normalising flows <a href='#rezende2015' id='ref-rezende2015-1'>(Rezende and Mohamed, 2015)</a>. Otherwise, the hierarchical prior might be not expressive enough and the model could compensate that by regularising <span class="math">\(q_\phi(\mathbf{z}|\mathbf{x})\)</span>. This would result in a restricted latent representation.</p>
+<h3 id="comparison-to-variational-autoencoders-with-standard-normal-priors">Comparison to Variational Autoencoders with standard Normal priors</h3>
+<p>Our key reason to introduce hierarchical priors was to get an informative latent representation. But does it work? To verify the quality of the latent representations, we build on the manifold hypothesis <a href='#rifai2011' id='ref-rifai2011-1'>(Rifai et al., 2011)</a>. The idea can be summarised by the following assumption: real-world data presented in high-dimensional spaces is likely to concentrate close to nonlinear sub-manifolds of much lower dimensionality. Following this hypothesis, the quality of latent representations can be evaluated by interpolating between data points along the learned data manifold in the latent space&mdash;and reconstructing this path to the observable space.</p>
+<p>To verify the above assumption, we use a k-NN graph, which is built based on samples from the (learned) prior&mdash;hence, based on the learned latent representation&mdash;with edge weights that are Euclidean distances in the latent space between the related node pairs. To find the shortest path through the graph we use <span class="math">\(A^\star\)</span>, a classic search algorithm.</p>
+<p>In the following, we compare our method (VHP-VAE) to IWAE <a href='#burda2015' id='ref-burda2015-2'>(Burda et al., 2015)</a> a state-of-the-art method within the VAE framework that uses a standard normal prior.</p>
+<h4 id="cmu-human-motion-data">CMU Human Motion Data</h4>
+<p>First, let's have a look at the learned latent representation of five different human motions based on the <a href="http://mocap.cs.cmu.edu/">CMU Graphics Lab Motion Capture Database</a>. This dataset is especially well suited for visualisations since it is simple enough for a two-dimensional latent space.</p>
+<p><img class="image fit" src="https://argmax.ai/images/vhp-vae/graphs_human_motion.png"></p>
+<p>The k-NN graphs are built based on samples from the respective (learned) prior distributions. The bluescale indicates the edge weight and the coloured lines represent four human-movement interpolations between different poses. In case of the VHP-VAE, the latent representations of different movements are separated. By contrast, the IWAE cannot represent the different motions separately in the latent space since it is restricted by the standard normal prior. Reconstructing the above interpolations leads to the following human movements:</p>
+<p><img class="image fit" src="https://argmax.ai/images/vhp-vae/interpolations_human_motion.png"></p>
+<p>We marked discontinuities in the movements by blue boxes. Note that the VHP-VAE leads to smoother interpolations, whereas the IWAE interpolations show quite a few abrupt changes in the movements due to the missing structure in the latent space.</p>
+<h4 id="3d-faces">3D faces</h4>
+<p>How does the method scale to more complex data?  To validate this, we show a small experiment on 3D faces <a href='#bfm09' id='ref-bfm09-1'>(Paysan et al., 2009)</a>. In this case, the latent space is 32-dimensional:</p>
+<p><img class="image fit" src="https://argmax.ai/images/vhp-vae/interpolations_faces.png"></p>
+<h3 id="final-words">Final words</h3>
+<p>In this blog post, we have seen that the learned hierarchical prior is indeed nontrivial, moreover, it is well-adapted to the latent representation, reflecting the topology of the encoded data manifold. The method provides informative latent representations and performs particularly well on data, where the relevant features change continuously.</p>
+<hr>
+<p><em>This work was published (spotlight) at the Conference on Neural Information Processing Systems (NeurIPS), 2019 <a href="https://arxiv.org/abs/1905.04982">[preprint]</a></em></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%&#64;#$&#64;#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%&#64;#$&#64;#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script><hr>
+<h2>Bibliography</h2>
+<p id='2017arXiv171100464A'>Alexander&nbsp;A Alemi, Ben Poole, Ian Fischer, Joshua&nbsp;V Dillon, Rif&nbsp;A Saurous, and Kevin Murphy.
+Fixing a broken <span class="bibtex-protected">ELBO</span>.
+<em>ICML</em>, 2018. <a class="cite-backref" href="#ref-2017arXiv171100464A-1" title="Jump back to reference 1">↩</a></p>
+<p id='K16-1002'>Samuel&nbsp;R. Bowman, Luke Vilnis, Oriol Vinyals, Andrew Dai, Rafal Jozefowicz, and Samy Bengio.
+Generating sentences from a continuous space.
+<em>CoNLL</em>, 2016. <a class="cite-backref" href="#ref-K16-1002-1" title="Jump back to reference 1">↩</a></p>
+<p id='burda2015'>Yuri Burda, Roger&nbsp;B. Grosse, and Ruslan Salakhutdinov.
+Importance weighted autoencoders.
+<em>CoRR</em>, 2015. <a class="cite-backref" href="#ref-burda2015-1" title="Jump back to reference 1">↩</a><a class="cite-backref" href="#ref-burda2015-1" title="Jump back to reference 1"> <sup>1</sup> </a><a class="cite-backref" href="#ref-burda2015-2" title="Jump back to reference 2"><sup>2</sup> </a></p>
+<p id='Chen2016VariationalLA'>Xi&nbsp;Chen, Diederik&nbsp;P. Kingma, Tim Salimans, Yan Duan, Prafulla Dhariwal, John Schulman, Ilya Sutskever, and Pieter Abbeel.
+Variational lossy autoencoder.
+<em>CoRR</em>, 2016. <a class="cite-backref" href="#ref-Chen2016VariationalLA-1" title="Jump back to reference 1">↩</a></p>
+<p id='cremer2017'>Chris Cremer, Quaid Morris, and David Duvenaud.
+Reinterpreting importance-weighted autoencoders.
+<em>arXiv:1704.02916</em>, 2017. <a class="cite-backref" href="#ref-cremer2017-1" title="Jump back to reference 1">↩</a></p>
+<p id='higgins2017beta'>Irina Higgins, Loic Matthey, Arka Pal, Christopher Burgess, Xavier Glorot, Matthew Botvinick, Shakir Mohamed, and Alexander Lerchner.
+<span class="bibtex-protected">Beta-VAE: Learning basic visual concepts with a constrained variational framework</span>.
+<em>ICLR</em>, 2017. <a class="cite-backref" href="#ref-higgins2017beta-1" title="Jump back to reference 1">↩</a></p>
+<p id='kingma2013'>Diederik&nbsp;P. Kingma and Max Welling.
+Auto-encoding variational bayes.
+<em>CoRR</em>, 2013. <a class="cite-backref" href="#ref-kingma2013-1" title="Jump back to reference 1">↩</a><a class="cite-backref" href="#ref-kingma2013-1" title="Jump back to reference 1"> <sup>1</sup> </a><a class="cite-backref" href="#ref-kingma2013-2" title="Jump back to reference 2"><sup>2</sup> </a></p>
+<p id='neal1998view'>Radford&nbsp;M Neal and Geoffrey&nbsp;E Hinton.
+A view of the em algorithm that justifies incremental, sparse, and other variants.
+In <em>Learning in graphical models</em>.
+1998. <a class="cite-backref" href="#ref-neal1998view-1" title="Jump back to reference 1">↩</a></p>
+<p id='bfm09'>P.&nbsp;Paysan, R.&nbsp;Knothe, B.&nbsp;Amberg, S.&nbsp;Romdhani, and T.&nbsp;Vetter.
+A 3d face model for pose and illumination invariant face recognition.
+<em>AVSS</em>, 2009. <a class="cite-backref" href="#ref-bfm09-1" title="Jump back to reference 1">↩</a></p>
+<p id='rezende2015'>Danilo&nbsp;Jimenez Rezende and Shakir Mohamed.
+Variational inference with normalizing flows.
+<em>ICML</em>, 2015. <a class="cite-backref" href="#ref-rezende2015-1" title="Jump back to reference 1">↩</a></p>
+<p id='rezende2014'>Danilo&nbsp;Jimenez Rezende, Shakir Mohamed, and Daan Wierstra.
+Stochastic backpropagation and approximate inference in deep generative models.
+In <em>Proceedings of the 31st International Conference on International Conference on Machine Learning - Volume 32</em>, ICML'14, II&ndash;1278–II&ndash;1286. JMLR.org, 2014.
+URL: <a href="http://dl.acm.org/citation.cfm?id=3044805.3045035">http://dl.acm.org/citation.cfm?id=3044805.3045035</a>. <a class="cite-backref" href="#ref-rezende2014-1" title="Jump back to reference 1">↩</a><a class="cite-backref" href="#ref-rezende2014-1" title="Jump back to reference 1"> <sup>1</sup> </a><a class="cite-backref" href="#ref-rezende2014-2" title="Jump back to reference 2"><sup>2</sup> </a></p>
+<p id='rezende2018'>Danilo&nbsp;Jimenez Rezende and Fabio Viola.
+<span class="bibtex-protected">Taming VAEs</span>.
+<em>arXiv:1810.00597</em>, 2018. <a class="cite-backref" href="#ref-rezende2018-1" title="Jump back to reference 1">↩</a><a class="cite-backref" href="#ref-rezende2018-1" title="Jump back to reference 1"> <sup>1</sup> </a><a class="cite-backref" href="#ref-rezende2018-2" title="Jump back to reference 2"><sup>2</sup> </a></p>
+<p id='rifai2011'>Salah Rifai, Yann&nbsp;N Dauphin, Pascal Vincent, Yoshua Bengio, and Xavier Muller.
+The manifold tangent classifier.
+<em>NeurIPS</em>, 2011. <a class="cite-backref" href="#ref-rifai2011-1" title="Jump back to reference 1">↩</a></p>
+<p id='sonderby2016'>Casper&nbsp;Kaae S<span class="bibtex-protected">ø</span>nderby, Tapani Raiko, Lars Maal<span class="bibtex-protected">ø</span>e, S<span class="bibtex-protected">ø</span>ren&nbsp;Kaae S<span class="bibtex-protected">ø</span>nderby, and Ole Winther.
+Ladder variational autoencoders.
+<em>NeurIPS</em>, 2016. <a class="cite-backref" href="#ref-sonderby2016-1" title="Jump back to reference 1">↩</a><a class="cite-backref" href="#ref-sonderby2016-1" title="Jump back to reference 1"> <sup>1</sup> </a><a class="cite-backref" href="#ref-sonderby2016-2" title="Jump back to reference 2"><sup>2</sup> </a></p>
+<p id='tomczak2017'>Jakub Tomczak and Max Welling.
+<span class="bibtex-protected">VAE with a VampPrior</span>.
+<em>AISTATS</em>, 2018. <a class="cite-backref" href="#ref-tomczak2017-1" title="Jump back to reference 1">↩</a><a class="cite-backref" href="#ref-tomczak2017-1" title="Jump back to reference 1"> <sup>1</sup> </a><a class="cite-backref" href="#ref-tomczak2017-2" title="Jump back to reference 2"><sup>2</sup> </a></p>
+
+    </p>
+
+    <footer>
+      <ul class="stats">
+        <!-- <li id='article_category'><a href="https://argmax.ai/blog/">blog</a></li> -->
+
+
+          <li><a target="_blank" href='mailto:?subject=Sharing a post from argmax.ai&body=Check out this post I came across "Learning Hierarchical Priors in VAEs" at https://argmax.ai/blog/vhp-vae/"' class="icon fa-envelope">Email</a></li>
+          <li><a target="_blank" href='http://twitter.com/intent/tweet?status=Learning Hierarchical Priors in VAEs+https://argmax.ai/blog/vhp-vae/' class="icon fa-twitter">Twitter</a></li>
+          <li><a target="_blank" href='http://www.reddit.com/submit?url=https://argmax.ai/blog/vhp-vae/&title=Learning Hierarchical Priors in VAEs' class="icon fa-reddit">Reddit</a></li>
+          <li><a target="_blank" href="http://www.linkedin.com/shareArticle?mini=true&url=https://argmax.ai/blog/vhp-vae/&title=Learning Hierarchical Priors in VAEs&source=https://argmax.ai" class="icon fa-linkedin">LinkedIn</a></li>
+          <li><a target="_blank" href='https://news.ycombinator.com/submitlink?t=Learning Hierarchical Priors in VAEs&u=https://argmax.ai/blog/vhp-vae/' class="icon fa-hacker-news">HackerNews</a></li>
+
+      </ul>
+    </footer>
+  </article>
+
+  <ul class="actions pagination">
+
+      <li><a href="#" class="disabled button previous">Previous post</a></li>
+
+        <li><a href="https://argmax.ai/blog/setinvariance/" class="button next">How to Learn Functions on Sets with Neural Networks</a></li>
+  </ul>
+  
+</div>
+
+
+
+
+
+
+<div id="comments" class="comments">
+
+</div>
+
+<section id="footer">
+  <p class="copyright">&copy; argmax.ai  - <a href="https://argmax.ai//imprint">Imprint</a> - <a href="https://argmax.ai//data-protection">Data Protection</a> - <a href="https://argmax.ai//copyright">Copyright</a>
+</section><!-- <section id="footer">
+  <p class="copyright">&copy; argmax.ai. 
+  Powered by <a href="http://blog.getpelican.com/">Pelican</a>.</p>
+</section> -->
+		</div>
+
+	<!-- Scripts -->
+		<script src="https://argmax.ai/theme/js/skel.min.js"></script>
+		<script src="https://argmax.ai/theme/js/util.js"></script>
+		<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+		<script src="https://argmax.ai/theme/js/main.js"></script>
+
+	</body>
+</html>

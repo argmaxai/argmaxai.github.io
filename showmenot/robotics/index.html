@@ -1,0 +1,475 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+  
+		
+
+		<title>Sensorised robot limbs · argmax.ai</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+	
+		<link rel="stylesheet" href="https://argmax.ai/theme/css/main.css" />
+		<link rel="stylesheet" href="https://argmax.ai/theme/css/pygment.css" />
+		<link rel="stylesheet" href="https://argmax.ai/theme/css/custom.css" />
+		<!--[if lte IE 9]><link rel="stylesheet" href="https://argmax.ai/theme/css/ie9.css" /><![endif]-->
+		<!--[if lte IE 8]><link rel="stylesheet" href="https://argmax.ai/theme/css/ie8.css" /><![endif]-->
+
+
+		<style>
+		body {
+		    background: #fffaff;
+		}
+		</style>
+		
+
+
+		<script src="https://argmax.ai/theme/js/jquery.min.js"></script>
+
+
+		<link rel="shortcut icon" href="https://argmax.ai/images/iconified/favicon.ico" type="image/x-icon" />
+		<link rel="apple-touch-icon" href="https://argmax.ai/images/iconified/apple-touch-icon.png" />
+		<link rel="apple-touch-icon" sizes="57x57" href="https://argmax.ai/images/iconified/apple-touch-icon-57x57.png" />
+		<link rel="apple-touch-icon" sizes="72x72" href="https://argmax.ai/images/iconified/apple-touch-icon-72x72.png" />
+		<link rel="apple-touch-icon" sizes="76x76" href="https://argmax.ai/images/iconified/apple-touch-icon-76x76.png" />
+		<link rel="apple-touch-icon" sizes="114x114" href="https://argmax.ai/images/iconified/apple-touch-icon-114x114.png" />
+		<link rel="apple-touch-icon" sizes="120x120" href="https://argmax.ai/images/iconified/apple-touch-icon-120x120.png" />
+		<link rel="apple-touch-icon" sizes="144x144" href="https://argmax.ai/images/iconified/apple-touch-icon-144x144.png" />
+		<link rel="apple-touch-icon" sizes="152x152" href="https://argmax.ai/images/iconified/apple-touch-icon-152x152.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="https://argmax.ai/images/iconified/apple-touch-icon-180x180.png" />
+
+
+  <meta property="og:title" content="Sensorised robot limbs - argmax.ai"/>
+  <meta property="og:description" content="A very succinct overview of some main issues to robotics—but be forewarned that it mainly deals with robotic arms (or, arguably, other limbs)."/>
+  <meta property="og:url" content="https://argmax.ai/showmenot/robotics/" />
+
+
+
+    <meta name="tags" contents="robotics" />
+
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+  <script src="https://argmax.ai/theme/js/custom.js"></script>
+
+
+	</head>
+	<body class="single">
+      <progress value="0"></progress>
+	<!-- Wrapper -->
+		<div id="wrapper">
+
+			<!-- Header -->
+				<header id="header">
+					<h1><a href="https://argmax.ai/">argmax.ai</a></h1>
+					<nav class="links">
+	
+						<ul>
+							<li><a href="https://argmax.ai/papers">Papers</a></li>
+
+							<li><a href="https://argmax.ai/blog/">blog</a></li>
+							<li><a href="https://argmax.ai/ml-course/">ml course</a></li>
+							<li><a href="https://argmax.ai/talks/">talks</a></li>
+							<li><a href="https://argmax.ai/team/">team</a></li>
+
+						</ul>
+
+					</nav>
+					
+					<nav class="main">
+						<ul>
+							<!-- Social -->
+
+							<li class="menu">
+								<a class="fa-edit" href="https://gitlab.com/-/ide/project/argmax-ai/misc/argmax_blog_source/edit/master/-/content/blog/2018-03-16_robotics.md">Edit</a>
+							</li>
+
+							<li class="search">
+								<a class="fa-search" href="#search">Search</a>
+								<form id="search" method="get" action="https://argmax.ai/search.html">
+									<input type="text" name="q" placeholder="Search" id="tipue_search_input" autocomplete="off" required />
+								</form>
+							</li>
+							<li class="menu">
+								<a class="fa-bars" href="#menu">Menu</a>
+							</li>
+						</ul>
+					</nav>
+				</header>
+
+			<!-- Menu -->
+<section id="menu">
+
+  <!-- Search -->
+    <section>
+      <form class="search" method="get" action="https://argmax.ai/search.html">
+        <input type="text" name="q" id="tipue_search_input" placeholder="Search" autocomplete="off" required />
+      </form>
+    </section>
+
+  <!-- Links -->
+    <section>
+      <ul class="links">
+
+
+
+        <li>
+          <a href="https://argmax.ai/papers">
+            <h3>Papers</h3>
+<p>Our latest publications</p>          </a>
+        </li>
+
+        <li>
+          <a href="https://argmax.ai/blog/">
+            <h3>blog</h3>
+<p>Implementations, papers, opinions, etc.</p>          </a>
+        </li>
+        <li>
+          <a href="https://argmax.ai/ml-course/">
+            <h3>ml course</h3>
+<p>Video lectures and slides on Machine Learning</p>          </a>
+        </li>
+        <li>
+          <a href="https://argmax.ai/talks/">
+            <h3>talks</h3>
+<p>Open scientific talks</p>          </a>
+        </li>
+        <li>
+          <a href="https://argmax.ai/team/">
+            <h3>team</h3>
+<p>The whole crew</p>          </a>
+        </li>
+
+
+      </ul>
+    </section>
+
+  <!-- Social -->
+
+<!-- 
+    <section>
+      <ul class="align-center actions horizontal">
+        <li><a href="None" class="icon fa-feed"><span class="label">RSS</span></a></li>
+      </ul>
+    </section>
+ -->
+
+  <!-- Actions -->
+<!--  -->
+    <section>
+      <ul class="actions vertical">
+        <li><a href="https://argmax.ai/about" class="button big fit">About</a></li>
+      </ul>
+    </section>
+
+</section>
+			<!-- Main -->
+<div id="main">
+  <article class="post">
+    <header>
+      <div class="title">
+        <h2>
+        Sensorised robot limbs
+        </h2>
+        <p>A short essay for non-roboticists</p>
+      </div>
+      <div class="meta">
+        <time class="published" datetime="2018-08-08T00:00:00+02:00">08 August 2018</time>
+
+
+
+        <a class="author" href="https://argmax.ai/team/patrick-van-der-smagt">
+        <span class="name">Patrick van der Smagt</span>
+        <img src="https://argmax.ai/images/avatars/smagt.png" alt="" />
+        </a>
+      </div>
+    </header>
+
+     
+    <p >
+        <p>
+    <figure class="cap-left">
+        <img src="https://argmax.ai/images/robotics/arms.jpg" class="image featured">
+<!--         <figcaption>
+        </figcaption> -->
+    </figure>
+</p>
+
+<p>The below gives a very succinct overview of some main issues to
+robotics&mdash;but be forewarned that it mainly deals with robotic arms (or,
+arguably, other limbs).</p>
+<!-- PELICAN_END_SUMMARY -->
+
+<h2 id="traditional-robot-arms">Traditional robot arms</h2>
+<p>A large part of traditional robotics can be described as transformations
+of manifolds. For instance, a pick-and-place operation can be formulated
+as follows:</p>
+<ol>
+<li>The pixel image <span class="math">\(I\)</span> is transformed to Cartesian coordinates
+    <span class="math">\((x,y,z)\)</span> indicating, e.g., the centre of mass of the known object;</li>
+<li>The target position <span class="math">\(\boldsymbol p_d=(x,y,z)\)</span> is transformed to a set of
+    joint angles <span class="math">\(\boldsymbol q_d\)</span> that describe the joint angles the robot
+    should take so that its end-effector reach the position <span class="math">\(\boldsymbol p_d\)</span>;</li>
+<li>The desired joint angles <span class="math">\(\boldsymbol q_d\)</span> is transformed to a sequence of
+    joint angles
+    <span class="math">\(\boldsymbol q_0, \boldsymbol q_0 + \Delta\boldsymbol q, \boldsymbol q_0 + 2\Delta\boldsymbol q, \dots, \boldsymbol q_d\)</span>,
+    describing a trajectory in joint space;</li>
+<li><a name="dynamics"></a><span class="math">\(\Delta\boldsymbol q\)</span> is transformed to joint torques <span class="math">\(\boldsymbol\tau\)</span>;</li>
+<li><span class="math">\(\boldsymbol\tau\)</span> is transformed to motor currents <span class="math">\(\boldsymbol i\)</span>.</li>
+</ol>
+<p>Each and every one of the abovementioned transformations is defined by a
+<em>model</em>. For instance, in the first transformation this is an
+environment model, in which the target object is known (and thus can be
+recognised through an algorithm), while the camera parameters are also
+known (or <em>calibrated</em>, and thus the pixel image can be transformed to a
+coordinate in Cartesian space). In the second transformation, Cartesian
+space can be transformed to joint space through inverse kinematics,
+requiring detailed knowledge of the robot system, while at the same time
+possibly solving underdeterminedness of the system.</p>
+<p>The use of such models is both advantageous and a problem. When the
+models are highly accurate&mdash;e.g., the forwards and cq. inverse
+kinematics of a robot arm&mdash;as well as stable, and can be easily
+obtained, their use to linearise the transformations is efficient. But
+in some cases this is not easily done. Already the first transformation
+in the above example demonstrates this: it limits the system to work in
+predefined environments only, <em>and</em> restricts its use to simple, highly
+dependable and calibrated sensors. When, e.g., cameras are not
+calibrated, or soft tactile sensors are used, models do not suffice or
+are unavailable, and machine-learning methods are needed. Or, increase
+the complexity of the task and models are insufficient. This happens,
+for instance, when the goal cannot be simply described</p>
+<p>Similarly problematic is the case there the dynamics of the robot is no
+longer simply computed (<a href="#dynamics">step above</a>). And this is where industrial and
+modern robotics diverge. The dynamics of an industrial robot can be
+simplified by assuming independence of each of its joints. That is, the
+movement of joint <span class="math">\(i\)</span> is assumed to have no influence on that of joints
+<span class="math">\(i-1\)</span> nor <span class="math">\(i+1\)</span>&mdash;or any of the other joints for that matter. By
+building the robot's (direct-drive or low gear ratio) motors strong
+enough so that this assumption holds, and making its beams (links)
+strong and non-bending, this approach works well. But the resulting
+robot is so strong, that interaction with humans is too dangerous.</p>
+<h2 id="light-weight-robots">Light-weight robots</h2>
+<p>To solve this, light-weight robots increased in popularity in the 1990s.
+The principle of such a robot is simple: apart from a light structure,
+the light-weight robot is defined by small, high-revolute motors which
+can only create useful torques through high-ratio gears (e.g., 1:100;
+typically a harmonic gear). The whole structure can be built at rather
+low weights&mdash;a reduction by an order of magnitude is possible while
+reaching the same torques&mdash;but introduces some problems:</p>
+<ol>
+<li>The nonlinearity of the gears are hard to model, thus leading to
+    inaccuracies;</li>
+<li>The high gear ratio introduces backlash;</li>
+<li>The reduced strength of the beams introduces undesired
+    flexibilities;</li>
+<li><a name="speed"></a>The high
+    gear ratio reduces the maximal speed and acceleration of the joints.</li>
+</ol>
+<p>Though models, in combination with feedback control, can still be
+constructed to solve the former of the above problems, still it requires
+very accurate robot production methods&mdash;in particular for the
+gear&mdash;thus increasing the cost of the robot. This was observed in,
+e.g., the KUKA LWR, which was about an order of magnitude more expensive
+than its "stiff" counterparts.</p>
+<!-- ![The DLR LBR-III, from which the KUKA LWR-4 was produced.]({filename}/images/robotics/arms.jpg) -->
+
+<!-- {% img image fit {filename}/images/robotics/arms.jpg %} -->
+
+<!-- ![Lightweight robots (left to right): Barrett arm, DLR Lightweight Robot III, KUKA LBR iiwa, FRANKA EMIKA; passively flexible anthropomorphic robots left to right: COmpliant HuMANoid Platform (CO-MAN) from IIT, Valkyrie from NASA, and Hand Arm SYstem (HASY) from DLR.]({filename}/images/robotics/lwrs.png) -->
+
+<p>The second problem is harder to counteract. In a harmonic gear this is
+rather a matter of back drive: a small movement at the motor side has no
+measurable effect at the link side. The DLR LWR-III, later sold as KUKA
+LWR-4 and KUKA iiwa, solves this elegantly by including joint torque
+sensors at the link side. This has the advantage that the joints can be
+used as sensors, since models of joint and gears allows measuring
+differences between expected and the measured torques, thus enabling
+relatively accurate measurement of outside impacts. The sensors, of
+course, increase costs, but the system now can be used for impedance
+control. This control strategy, inspired by biological behaviour, is
+important for interaction of robots with the environment. Rather than
+defining the position of the joint, it defines its <em>position and
+stiffness</em>. The latter can be seen as a force field or spring around the
+position; the characteristics of these springs can be defined by
+control.</p>
+<p>From March 2009 the KUKA LBR 4 has been used in the fully automated
+assembly of rear axle gearboxes at the Mercedes-Benz Untertürkheim
+plant, assembling hundreds of thousands of gear boxes. Its "sensitivity"
+allow it to be used in assembly operations, quite comparable to how
+humans would do it.</p>
+<p>But it also introduces a problem: apart from the joint position, a robot
+movement now also needs to define a joint <em>stiffness</em> along its
+trajectory. How is this best chosen? Two approaches are possible: (1) by
+trying to observe humans using their stiffness variation, or (2) by
+optimal control.</p>
+<p>The former of these approaches is problematic: not only is measuring
+stiffness in human behaviour very hard, esp. during movement; but also,
+the range of stiffness that humans can attain and at what cost differs
+dramatically from robots. A transfer of strategies may lead to high
+inefficiency.</p>
+<p>Optimal-control strategies suffer from two other problems. First,
+traditional optimal control is non-tractable in the general case; that
+currently already occurs with robots with 2 degrees of freedom. Second,
+it is not always clear which cost function an optimal-control algorithm
+should optimise.</p>
+<p>Finally, problem <a href="#speed">above</a> is serious, as it limits the efficiency
+of a robot. If a robot moves or reacts slower than a human, it is no
+longer "fun" to work with it. Waiting for a machine is frustrating, and
+leads to reduced acceptability of such.</p>
+<h2 id="variable-impedance-robots">Variable-impedance robots</h2>
+<p>Working with the impedance-control subject shortly explained in the
+previous section, each position of the robot&mdash;be it in Cartesian or
+joint space&mdash;can be seen as having an additional mechanical spring
+connected to it. The robot can be moved away from a position through an
+external influence, and the force needed to do so is linearly related to
+how far that deflection is.</p>
+<p>But the spring is only defined by control. It is not a <em>real</em> spring,
+and therefore cannot store energy. Looking again into biology, there's
+something to be said to use real springs. Not only could these be used
+to absorb energy in the case of an impact, but also could that stored
+energy be used to generate large torques and thus very swift
+movements&mdash;the kangaroo-effect, so to say.</p>
+<p>Variable-stiffness cq. variable-impedance robots implement this in
+hardware, by adding additional springs to each actuators. In order to be
+variable, the spring constants of these must be changeable. Furthermore,
+since springs are physically finite, they must be nonlinear. Finally, of
+course springs add oscillations, so the control of the joints need to
+take damping into account&mdash;in fact, not different from the robots in
+the previous section.</p>
+<!-- ![Possible implementation of a nonlinear spring, as needed in a variable-impedance robot. The stiffness is linearly related to $l/h$.]({filename}/images/robotics/stiffness-setup.jpg) -->
+
+<p><img class="image left" src="https://argmax.ai/images/robotics/stiffness-setup.jpg"></p>
+<blockquote>
+<p>Possible implementation of a nonlinear spring, as needed in a variable-impedance robot. The stiffness is linearly related to <span class="math">\(l / h\)</span>.</p>
+</blockquote>
+<p>Such robots not being universally available for commercial applications,
+they do have their merits, solving most if not all of the problems
+mentioned above. But of course, some problems are also introduced:</p>
+<ul>
+<li>The mechanical construction is difficult, and currently not ripe;</li>
+<li>Each joint now has 3 control parameters: position, stiffness, and
+    damping, thus making optimal control more complex;</li>
+<li>Models of the joints are very difficult to obtain.</li>
+</ul>
+<p>To our current knowledge, the above problems can only be used via modern
+machine-learning approaches.</p>
+<h2 id="human-robot-interaction">Human-robot interaction</h2>
+<p>Both the abovementioned light-weight robots and the variable-impedance
+robots are, in principle, suitable for human&ndash;robot interaction. Neither
+system is strong enough for serious peril&mdash;e.g., the DLR LWR-III was
+measured at a HIC of around 25. That makes the robot good to interact
+with humans. But can the human interact with the robot? To do so, the
+robot must be an acceptable proxy for another human. This requires
+various levels of interaction:</p>
+<ul>
+<li>the robot should match human movement agility&mdash;possible, perhaps,
+    for the variable-impedance robots mentioned above;</li>
+<li>the robot should predict human movement, to interact;</li>
+<li>the robot should recognise human movement.</li>
+</ul>
+<p>None of these are easily possible without modern machine-learning
+approaches.</p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+    </p>
+
+    <footer>
+      <ul class="stats">
+        <!-- <li id='article_category'><a href="https://argmax.ai/blog/">blog</a></li> -->
+
+
+          <li><a target="_blank" href='mailto:?subject=Sharing a post from argmax.ai&body=Check out this post I came across "Sensorised robot limbs" at https://argmax.ai/showmenot/robotics/"' class="icon fa-envelope">Email</a></li>
+          <li><a target="_blank" href='http://twitter.com/intent/tweet?status=Sensorised robot limbs+https://argmax.ai/showmenot/robotics/' class="icon fa-twitter">Twitter</a></li>
+          <li><a target="_blank" href='http://www.reddit.com/submit?url=https://argmax.ai/showmenot/robotics/&title=Sensorised robot limbs' class="icon fa-reddit">Reddit</a></li>
+          <li><a target="_blank" href="http://www.linkedin.com/shareArticle?mini=true&url=https://argmax.ai/showmenot/robotics/&title=Sensorised robot limbs&source=https://argmax.ai" class="icon fa-linkedin">LinkedIn</a></li>
+          <li><a target="_blank" href='https://news.ycombinator.com/submitlink?t=Sensorised robot limbs&u=https://argmax.ai/showmenot/robotics/' class="icon fa-hacker-news">HackerNews</a></li>
+
+      </ul>
+    </footer>
+  </article>
+
+  <ul class="actions pagination">
+
+      <li><a href="#" class="disabled button previous">Previous post</a></li>
+
+      <li><a href="#" class="disabled button next">Next post</a></li>
+  </ul>
+  
+</div>
+
+
+
+
+
+
+<div id="comments" class="comments">
+
+</div>
+
+<section id="footer">
+  <p class="copyright">&copy; argmax.ai  - <a href="https://argmax.ai//imprint">Imprint</a> - <a href="https://argmax.ai//data-protection">Data Protection</a> - <a href="https://argmax.ai//copyright">Copyright</a>
+</section><!-- <section id="footer">
+  <p class="copyright">&copy; argmax.ai. 
+  Powered by <a href="http://blog.getpelican.com/">Pelican</a>.</p>
+</section> -->
+		</div>
+
+	<!-- Scripts -->
+		<script src="https://argmax.ai/theme/js/skel.min.js"></script>
+		<script src="https://argmax.ai/theme/js/util.js"></script>
+		<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+		<script src="https://argmax.ai/theme/js/main.js"></script>
+
+	</body>
+</html>

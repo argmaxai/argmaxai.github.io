@@ -1,0 +1,419 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+  
+		
+
+		<title>Network Architecture Optimisation · argmax.ai</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+	
+		<link rel="stylesheet" href="https://argmax.ai/theme/css/main.css" />
+		<link rel="stylesheet" href="https://argmax.ai/theme/css/pygment.css" />
+		<link rel="stylesheet" href="https://argmax.ai/theme/css/custom.css" />
+		<!--[if lte IE 9]><link rel="stylesheet" href="https://argmax.ai/theme/css/ie9.css" /><![endif]-->
+		<!--[if lte IE 8]><link rel="stylesheet" href="https://argmax.ai/theme/css/ie8.css" /><![endif]-->
+
+
+		<style>
+		body {
+		    background: #fffaff;
+		}
+		</style>
+		
+
+
+		<script src="https://argmax.ai/theme/js/jquery.min.js"></script>
+
+
+		<link rel="shortcut icon" href="https://argmax.ai/images/iconified/favicon.ico" type="image/x-icon" />
+		<link rel="apple-touch-icon" href="https://argmax.ai/images/iconified/apple-touch-icon.png" />
+		<link rel="apple-touch-icon" sizes="57x57" href="https://argmax.ai/images/iconified/apple-touch-icon-57x57.png" />
+		<link rel="apple-touch-icon" sizes="72x72" href="https://argmax.ai/images/iconified/apple-touch-icon-72x72.png" />
+		<link rel="apple-touch-icon" sizes="76x76" href="https://argmax.ai/images/iconified/apple-touch-icon-76x76.png" />
+		<link rel="apple-touch-icon" sizes="114x114" href="https://argmax.ai/images/iconified/apple-touch-icon-114x114.png" />
+		<link rel="apple-touch-icon" sizes="120x120" href="https://argmax.ai/images/iconified/apple-touch-icon-120x120.png" />
+		<link rel="apple-touch-icon" sizes="144x144" href="https://argmax.ai/images/iconified/apple-touch-icon-144x144.png" />
+		<link rel="apple-touch-icon" sizes="152x152" href="https://argmax.ai/images/iconified/apple-touch-icon-152x152.png" />
+		<link rel="apple-touch-icon" sizes="180x180" href="https://argmax.ai/images/iconified/apple-touch-icon-180x180.png" />
+
+
+  <meta property="og:title" content="Network Architecture Optimisation - argmax.ai"/>
+    <meta property="og:image" content="https://argmax.ai/images/archopt_cover.png"/>
+  <meta property="og:description" content="Intuition and experience. Probably, that&#39;s the answer you would get if you happen to ask deep learning engineers how they chose the hyperparameters of a neural network. Depending on their familiarity with the problem, they might have done some good three to five full dataset runs until a satisfactory result popped up. Now, you might say, we surely could automate this, right, after all we do it implicitly in our heads? Well, yes, we definitely could, but should we?"/>
+  <meta property="og:url" content="https://argmax.ai/blog/archopt/" />
+
+
+
+    <meta name="tags" contents="Bayes" />
+    <meta name="tags" contents="variational inference" />
+    <meta name="tags" contents="architecture optimisation" />
+    <meta name="tags" contents="concrete distributions" />
+
+  <script src="https://apis.google.com/js/platform.js" async defer></script>
+  <script src="https://argmax.ai/theme/js/custom.js"></script>
+
+
+	</head>
+	<body class="single">
+      <progress value="0"></progress>
+	<!-- Wrapper -->
+		<div id="wrapper">
+
+			<!-- Header -->
+				<header id="header">
+					<h1><a href="https://argmax.ai/">argmax.ai</a></h1>
+					<nav class="links">
+	
+						<ul>
+							<li><a href="https://argmax.ai/papers">Papers</a></li>
+
+							<li><a href="https://argmax.ai/blog/">blog</a></li>
+							<li><a href="https://argmax.ai/ml-course/">ml course</a></li>
+							<li><a href="https://argmax.ai/talks/">talks</a></li>
+							<li><a href="https://argmax.ai/team/">team</a></li>
+
+						</ul>
+
+					</nav>
+					
+					<nav class="main">
+						<ul>
+							<!-- Social -->
+
+							<li class="menu">
+								<a class="fa-edit" href="https://gitlab.com/-/ide/project/argmax-ai/misc/argmax_blog_source/edit/master/-/content/blog/2018-07-25_archopt.md">Edit</a>
+							</li>
+
+							<li class="search">
+								<a class="fa-search" href="#search">Search</a>
+								<form id="search" method="get" action="https://argmax.ai/search.html">
+									<input type="text" name="q" placeholder="Search" id="tipue_search_input" autocomplete="off" required />
+								</form>
+							</li>
+							<li class="menu">
+								<a class="fa-bars" href="#menu">Menu</a>
+							</li>
+						</ul>
+					</nav>
+				</header>
+
+			<!-- Menu -->
+<section id="menu">
+
+  <!-- Search -->
+    <section>
+      <form class="search" method="get" action="https://argmax.ai/search.html">
+        <input type="text" name="q" id="tipue_search_input" placeholder="Search" autocomplete="off" required />
+      </form>
+    </section>
+
+  <!-- Links -->
+    <section>
+      <ul class="links">
+
+
+
+        <li>
+          <a href="https://argmax.ai/papers">
+            <h3>Papers</h3>
+<p>Our latest publications</p>          </a>
+        </li>
+
+        <li>
+          <a href="https://argmax.ai/blog/">
+            <h3>blog</h3>
+<p>Implementations, papers, opinions, etc.</p>          </a>
+        </li>
+        <li>
+          <a href="https://argmax.ai/ml-course/">
+            <h3>ml course</h3>
+<p>Video lectures and slides on Machine Learning</p>          </a>
+        </li>
+        <li>
+          <a href="https://argmax.ai/talks/">
+            <h3>talks</h3>
+<p>Open scientific talks</p>          </a>
+        </li>
+        <li>
+          <a href="https://argmax.ai/team/">
+            <h3>team</h3>
+<p>The whole crew</p>          </a>
+        </li>
+
+
+      </ul>
+    </section>
+
+  <!-- Social -->
+
+<!-- 
+    <section>
+      <ul class="align-center actions horizontal">
+        <li><a href="None" class="icon fa-feed"><span class="label">RSS</span></a></li>
+      </ul>
+    </section>
+ -->
+
+  <!-- Actions -->
+<!--  -->
+    <section>
+      <ul class="actions vertical">
+        <li><a href="https://argmax.ai/about" class="button big fit">About</a></li>
+      </ul>
+    </section>
+
+</section>
+			<!-- Main -->
+<div id="main">
+  <article class="post">
+    <header>
+      <div class="title">
+        <h2>
+        Network Architecture Optimisation
+        </h2>
+        <p>The Bayesian way</p>
+      </div>
+      <div class="meta">
+        <time class="published" datetime="2018-07-25T00:00:00+02:00">25 July 2018</time>
+
+
+
+        <a class="author" href="https://argmax.ai/team/georgi-dikov">
+        <span class="name">Georgi Dikov</span>
+        <img src="https://argmax.ai/images/avatars/georgi.jpg" alt="" />
+        </a>
+      </div>
+    </header>
+
+    <figure class="cap-left">
+    <img class="image featured" src="https://argmax.ai/images/archopt_cover.png" alt="" />
+    </figure>
+     
+    <p >
+        <p>Intuition and experience. Probably, that's the answer you would get if you happen to ask deep learning engineers how they chose the hyperparameters of a neural network. Depending on their familiarity with the problem, they might have done some good three to five full dataset runs until a satisfactory result popped up. Now, you might say, we surely could automate this, right, after all we do it implicitly in our heads? Well, yes, we definitely could, but should we?</p>
+
+
+<p>Imagine you want to search among a single hyperparameter, say the depth of the network. How about some <span class="math">\(\{3, 5, 8, 11\}\)</span>-layer deep networks. This will require you at least four training cycles consisting in creation, initialisation, training until convergence and evaluation on a held-out test set. Maybe that's not that bad. What happens, however, if you decide to search for an optimal layer size too? In convolutional neural networks, you can even pick strides, filter sizes and so on. The search space quickly grows beyond any imaginable human patience. And let's admit it, most of the time you just pretend to be happy with what you end up with after a couple of trials.</p>
+<p>Nevertheless, the situation is far from hopeless as there's still a way to learn the architecture directly from the data! In the following blog post we will look into that and show an approach that allows us to probabilistically interpret the learnt architecture and thereby spot engineered design misspecifications. Moreover, we will do it the <em>Bayesian</em> way, meaning that we will incorporate our architectural views merely as prior beliefs rather than hard constraints.</p>
+<h2 id="bayesian-deep-learning">Bayesian deep learning</h2>
+<p>Being Bayesian about anything as complex as a neural architecture is all but easy. In essence, we are asking for the form of a posterior distribution over some parameters <span class="math">\(\alpha\)</span> after observing labelled data <span class="math">\((\mathbf{x},\, \mathbf{y})\)</span>, or <span class="math">\(p\left(\alpha\mid\mathbf{x},\, \mathbf{y}\right)\)</span> for short. The Bayes' rule of probability tells us that:
+</p>
+<div class="math">$$
+p\left(\alpha \mid \mathbf{x},\, \mathbf{y} \right) = \frac{p\left(\mathbf{y}\mid\mathbf{x},\, \alpha\right)p\left(\alpha\right)}{p\left(\mathbf{y}\mid\mathbf{x}\right)}
+$$</div>
+<p>
+Due to the intractability of computing the evidence <span class="math">\(p\left(\mathbf{y}\mid\mathbf{x}\right)\)</span> we don't even dream of estimating <span class="math">\(p\left(\alpha\mid\mathbf{x},\, \mathbf{y}\right)\)</span> exactly. Instead we will reside to approximate inference techniques such as variational Bayes (VB) where we approximate <span class="math">\(p\left(\alpha\mid\mathbf{x},\, \mathbf{y}\right)\)</span> with a <span class="math">\(\theta\)</span>-parameterised distribution <span class="math">\(q_\theta\left(\alpha\mid\mathbf{x},\, \mathbf{y}\right)\)</span>. Fortunately, <a href='#jordan1999introduction' id='ref-jordan1999introduction-1'>Jordan et al. (1999)</a> showed that the dissimilarity between <span class="math">\(q_\theta\left(\alpha\mid\mathbf{x},\, \mathbf{y}\right)\)</span> and <span class="math">\(p\left(\alpha\mid\mathbf{x},\, \mathbf{y}\right)\)</span> can be decreased without explicitly computing <span class="math">\(p\left(\mathbf{y}\mid\mathbf{x}\right)\)</span>. The trick is to learn the <span class="math">\(\theta\)</span> such that a quantity called the <em><strong>E</strong>vidence <strong>L</strong>ower <strong>BO</strong>und</em> is maximised:
+</p>
+<div class="math">$$
+\mathcal{L}_{\text{ELBO}}\left(\alpha,\, \mathbf{x},\, \mathbf{y}\right) = \mathbb{E}_{q_{\theta}\left(\alpha\mid\mathbf{x},\, \mathbf{y}\right)}[\log{p\left(\mathbf{y}\mid\mathbf{x},\, \alpha\right)}] - \mathrm{KL}\left(q_\theta\left(\alpha\mid\mathbf{x},\, \mathbf{y}\right)\mid\mid p\left(\alpha\right)\right)
+$$</div>
+<p>
+However, this too is not computable in closed form and we will have to approximate it with sampling. We can go on and on discussing the issues and merits of this approach but we will stop here and instead go straight into the core of this post&mdash;applying VB to efficiently infer an approximate posterior distribution over the architectural parameters.</p>
+<h2 id="bayesian-architecture-learning">Bayesian architecture learning</h2>
+<p>We can think of certain structural hyperparameters as discrete random variables, e.g. the depth of a network and the size of a layer are well described by positive integer numbers. A categorical distribution may seem like a good modelling choice as it is flexible enough to represent <em>every</em> discrete distribution with domain <span class="math">\(\{1, 2, \dots, K\}\)</span>&mdash;only thing we have to do is to learn the probabilities <span class="math">\(\boldsymbol{\pi} = (\pi_1, \pi_2, \dots, \pi_K)\)</span> for each category. Unfortunately, to do this we cannot use the backpropagation algorithm because a sample of the categorical distribution is a non-differentiable transformation of <span class="math">\(\boldsymbol{\pi}\)</span> and some external noise <span class="math">\(\boldsymbol{\epsilon}\)</span>:
+</p>
+<div class="math">$$
+c = {\mathrm{arg}\,\mathrm{max}}_{i} \log{\pi}_i + \epsilon_i
+$$</div>
+<p>
+Instead we use a continuous approximation to it due to <a href='#maddison2016concrete' id='ref-maddison2016concrete-1'>Maddison et al. (2016)</a> and <a href='#jang2016categorical' id='ref-jang2016categorical-1'>Jang et al. (2016)</a>, where the non-differentiable <span class="math">\({\mathrm{arg}\,\mathrm{max}}\)</span> operator is replaced with the smooth <span class="math">\(\mathrm{softmax}\)</span>:
+</p>
+<div class="math">$$
+\tilde{c}_i = \frac{\exp{\left(\frac{\log{\pi}_i + \epsilon_i}{\tau}\right)}}{\sum_j \exp{\left(\frac{\log{\pi}_j + \epsilon_j}{\tau}\right)}}
+$$</div>
+<p>
+Notice that <span class="math">\(\mathbf{\tilde{c}} = (\tilde{c}_1, \tilde{c}_2, \dots, \tilde{c}_K)\)</span> is not a one-hot vector anymore and that the <em>temperature</em> parameter <span class="math">\(\tau\)</span> controls the degree of discreteness. But, most importantly, we can express, say, the size of the layer as a sample of a distribution the parameters of which we can learn via backpropagation!</p>
+<p>In order to bridge the gap between this result and the <span class="math">\(\mathcal{L}_{\text{ELBO}}\)</span> objective we discussed earlier, we only have to define a prior distribution over the architectural variable and express the data likelihood as a function of it without breaking the differentiability of the neural network. But that's just nothing compared to the mental and computational effort needed to find an optimal architecture using a search-based procedure. So let's do it quickly.</p>
+<h3 id="adaptive-layer-size">Adaptive layer size</h3>
+<p>Let <span class="math">\(\alpha\)</span> be the random variable representing the number of units within a layer. We can define prior and approximate posterior distributions respectively as:
+</p>
+<div class="math">\begin{align*}
+p_{\boldsymbol{\pi}_\text{prior}, \tau_\text{prior}}(\alpha) &amp;= \mathrm{ConcreteCategorical}(\alpha\mid\boldsymbol{\pi}_\text{prior}, \tau_\text{prior}) \\
+q_{\boldsymbol{\pi}, \tau}(\alpha\mid\mathbf{x}, \mathbf{y}) &amp;= \mathrm{ConcreteCategorical}(\alpha\mid\boldsymbol{\pi}, \tau)
+\end{align*}</div>
+<p>
+where we fix <span class="math">\(\tau\)</span> and learn only <span class="math">\(\boldsymbol{\pi}\)</span> to facilitate our task.
+If we want to learn the layer size for example, we must express the output of a layer as a deterministic operation of the sample <span class="math">\(\hat{\alpha} \sim q_{\boldsymbol{\pi}, \tau}(\alpha\mid\mathbf{x}, \mathbf{y})\)</span> and the weights and biases of it. One way to do it is to deterministically compute a quasi-binary mask <span class="math">\(M(\hat{\alpha})\)</span> that (approximately) lets <span class="math">\({\mathrm{arg}\,\mathrm{max}}_i \hat{\alpha}_i\)</span> unit activations through and shadows the rest, e.g. we can build it as a linear combination with coefficients <span class="math">\(\hat{\alpha}\)</span> of some cleverly-chosen set of binary masks:
+</p>
+<div class="math">$$
+M(\hat{\alpha}) = \mathbf{U}\hat{\alpha}, \quad
+\mathbf{U} := \begin{bmatrix}
+1 &amp; 1 &amp; 1 &amp; \dots  &amp; 1 \\
+0 &amp; 1 &amp; 1 &amp; \dots  &amp; 1 \\
+0 &amp; 0 &amp; 1 &amp; \dots  &amp; 1 \\
+\vdots &amp; \vdots &amp; \vdots &amp; \ddots &amp; \vdots \\
+0 &amp; 0 &amp; 0 &amp; \dots  &amp; 1 \\
+\end{bmatrix}
+$$</div>
+<p>Below you can see a concrete sample in the left and the corresponding mask in the right. The sharpness of this mask is mainly determined by <span class="math">\(\tau\)</span> but keep in mind that the gradients are inversely proportional to <span class="math">\(\tau\)</span> and learning becomes instable for <span class="math">\(\tau \rightarrow 0\)</span>.</p>
+<p>
+    <div class="row uniform">
+        <div class="3u"></div>
+        <div class="6u 12u$(small)">
+            <img src="https://argmax.ai/images/concrete_sample_and_mask.png" class="image fit">
+        </div>
+        <div class="3u$"></div>
+    </div>
+</p>
+
+<p>Job done, let's see what we can learn with it... well, wait a second. Before we move on, we remark that the variational parameters <span class="math">\(\boldsymbol{\pi}\)</span> are so unconstrained that it might be hard to interpret the posterior distribution. What would be the desired size in a multi-modal scenario? How do we read out the uncertainty over the layer size? After all, at the end of the day we would like to be able to tailor the architecture according to the learnt posterior distribution and fix it for good. To do this, we will have to constrain <span class="math">\(\boldsymbol{\pi}\)</span> in a way that ensures unimodality and an easily interpretable variance. We reside to the (modified) chicken soup of the distributions&mdash;the <a href="https://en.wikipedia.org/wiki/Truncated_normal_distribution">truncated Normal distribution</a>. That is, instead of <span class="math">\(\boldsymbol{\pi}\)</span> we now learn <span class="math">\(\mu\)</span> and <span class="math">\(\sigma\)</span> and set:
+</p>
+<div class="math">$$
+\pi_i = \frac{\mathcal{N}_{\text{trunc}}(i \mid \mu, \sigma, 1, K)}{\sum_j \mathcal{N}_{\text{trunc}}(j \mid \mu, \sigma, 1, K)}
+$$</div>
+<p>
+We can simply read out <span class="math">\(\mu\)</span> to get the most likely estimate for the size of the layer and <span class="math">\(\sigma\)</span> (which is not a standard deviation any more!) can be interpreted as an uncertainty around that point.</p>
+<h3 id="adaptive-network-depth">Adaptive network depth</h3>
+<p>To model the total depth of a network we can't just broadcast the mask over the outputs of each layer, as even a single fully masked intermediate layer will kill the output of the network. We go about this by using trainable skip connections which allow to bypass redundant layers. We can implement them by representing the layer as a convex combination of its input <span class="math">\(\mathbf{x}\)</span> and output <span class="math">\(f(\mathbf{W}\mathbf{x} + \mathbf{b})\)</span> controlled by a stochastic mixing coefficient <span class="math">\(\gamma \sim \mathrm{ConcreteBernoulli(\pi)}\)</span>:
+</p>
+<div class="math">$$
+\mathbf{\hat{y}} = (1 - \gamma)f(\mathbf{W}\mathbf{x} + \mathbf{b}) + \gamma\mathbf{x}
+$$</div>
+<p>
+In other words, we let <span class="math">\(\pi\)</span> represent the probability of skipping a layer and we learn it via backpropagation pretty much the same way we did for the adaptive layer size. Naturally, we can also define a concrete Bernoulli prior <span class="math">\(p_{\pi_\text{prior}}(\gamma)\)</span>. Without further ado, let's look into an example!</p>
+<h2 id="case-study-regression">Case-study: regression</h2>
+<p>There is hardly any more trivial and yet intuitive way to see how neural networks work, than fitting a nicely plottable one-dimensional noisy data. In order to show the effectiveness of the methods we will consider two cases. First, we will show the adaptive layer size applied on a single layer neural network with 50 units and then we will go deep with a rather "narrow" 10-layer network.</p>
+<h3 id="finding-the-optimal-layer-size">Finding the optimal layer size</h3>
+<p>For the sake of insightfulness we will put a rather silly architectural prior distribution with <span class="math">\(\mu_\text{prior}=1\)</span> and <span class="math">\(\sigma_\text{prior}=2\)</span> and hope that the network will learn a minimalistic layer architecture that also explains the data well. In the leftmost figure you can see the training data and the current best fit, computed by sampling from <span class="math">\(q_{\boldsymbol{\pi}, \tau}(\alpha\mid\mathbf{x}, \mathbf{y})\)</span>. The middle plot shows the truncated normal distribution from which <span class="math">\(\boldsymbol{\pi}\)</span> is derived and the rightmost image is an alternative visualisation showing the full history from the initialisation to the final solution.</p>
+<p><img class="image fit" src="https://argmax.ai/images/curve_fitting_lower_quality.gif"></p>
+<p>Indeed, the posterior over the size, as shown in the middle, shifts towards something more reasonable and thus unlocks more and more of the layer's capacity. It is only a matter of time for <span class="math">\(\mu\)</span> to settle and <span class="math">\(\sigma\)</span> to shrink at the nearly optimal unit count. Also, notice how the uncertainty is larger in the beginning when the layer size is inadequate and gradually sharpens later on, which gives us a good insight into how well the network structure is suited for the problem even without looking at the predictions!</p>
+<h3 id="finding-the-optimal-network-depth">Finding the optimal network depth</h3>
+<p>Ok, so far so good. We have shown that we can fit the data with one hidden layer hosting at least 21 units. To see whether we can also learn the depth of a deeper network, we will initialise 10 hidden layers of 5 units each, with a <span class="math">\(\pi_\text{prior} = 0.99\)</span> (i.e. we skip a layer with 99% probability). Obviously the task cannot be reliably solved by a single layer, so the network will have to learn to overcome the rather strong prior. The animation below shows the fit on the left and the probabilities <span class="math">\(\pi\)</span> for each layer, colour-coded in shades of grey where black means definitively "skip" and white "let through" respectively.</p>
+<p>
+    <div class="row uniform">
+        <div class="3u"></div>
+        <div class="6u 12u$(small)">
+            <img src="https://argmax.ai/images/curve_fitting_adaptive_depth.gif" class="image fit">
+        </div>
+        <div class="3u$"></div>
+    </div>
+</p>
+
+<p>It is interesting to see how the network quickly learns to use the heavily muted layers, while gradually unlocking more and more of them. Apparently 5 layers of 5 units are enough to explain the data and the posterior over the skip variable <span class="math">\(q_\pi(\gamma)\)</span> remains pretty close to the prior for the remaining 5 layers.</p>
+<p>If we wish, we could also combine the adaptive layer size and network depth approaches in a single elastic network and learn all hyperparameters jointly. For now, we leave this as an exercise for you!</p>
+<h2 id="final-words">Final words</h2>
+<p>In this blog post we have seen that it is very much possible to learn the basic architecture of feed-forward densely connected neural networks while in the same time tuning their weights to explain the data. This comes handy when you have no clue how to configure your model and also don't have the time and computational power to explore large hyperparameter spaces over many runs.
+Keep in mind that we have shown a method to infer an optimal layer size for standard layer types but there is no conceptual difficulty in extending it to convolutional and recurrent layers, where the mask is applied over the channels and the time steps axis respectively.
+Finally, we remark that despite its convenience, this technique adds an additional layer of complexity to the model. It is therefore best to use it only as a tool to infer near-optimal architectures. Once found, please do initialise a rigid model accordingly and train it until convergence.</p>
+<p>Good luck!</p>
+<hr>
+<p><em>This work was <a href="https://arxiv.org/abs/1901.04436">published at the International Conference on Artificial Intelligence and Statistics (AISTATS) 2019</a></em></p>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%&#64;#$&#64;#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%&#64;#$&#64;#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+    mathjaxscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'inherit ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script><hr>
+<h2>Bibliography</h2>
+<p id='jang2016categorical'>Eric Jang, Shixiang Gu, and Ben Poole.
+Categorical reparameterization with gumbel-softmax.
+<em>arXiv preprint arXiv:1611.01144</em>, 2016. <a class="cite-backref" href="#ref-jang2016categorical-1" title="Jump back to reference 1">↩</a></p>
+<p id='jordan1999introduction'>Michael&nbsp;I Jordan, Zoubin Ghahramani, Tommi&nbsp;S Jaakkola, and Lawrence&nbsp;K Saul.
+An introduction to variational methods for graphical models.
+<em>Machine learning</em>, 37(2):183–233, 1999. <a class="cite-backref" href="#ref-jordan1999introduction-1" title="Jump back to reference 1">↩</a></p>
+<p id='maddison2016concrete'>Chris&nbsp;J Maddison, Andriy Mnih, and Yee&nbsp;Whye Teh.
+The concrete distribution: a continuous relaxation of discrete random variables.
+<em>arXiv preprint arXiv:1611.00712</em>, 2016. <a class="cite-backref" href="#ref-maddison2016concrete-1" title="Jump back to reference 1">↩</a></p>
+
+    </p>
+
+    <footer>
+      <ul class="stats">
+        <!-- <li id='article_category'><a href="https://argmax.ai/blog/">blog</a></li> -->
+
+
+          <li><a target="_blank" href='mailto:?subject=Sharing a post from argmax.ai&body=Check out this post I came across "Network Architecture Optimisation" at https://argmax.ai/blog/archopt/"' class="icon fa-envelope">Email</a></li>
+          <li><a target="_blank" href='http://twitter.com/intent/tweet?status=Network Architecture Optimisation+https://argmax.ai/blog/archopt/' class="icon fa-twitter">Twitter</a></li>
+          <li><a target="_blank" href='http://www.reddit.com/submit?url=https://argmax.ai/blog/archopt/&title=Network Architecture Optimisation' class="icon fa-reddit">Reddit</a></li>
+          <li><a target="_blank" href="http://www.linkedin.com/shareArticle?mini=true&url=https://argmax.ai/blog/archopt/&title=Network Architecture Optimisation&source=https://argmax.ai" class="icon fa-linkedin">LinkedIn</a></li>
+          <li><a target="_blank" href='https://news.ycombinator.com/submitlink?t=Network Architecture Optimisation&u=https://argmax.ai/blog/archopt/' class="icon fa-hacker-news">HackerNews</a></li>
+
+      </ul>
+    </footer>
+  </article>
+
+  <ul class="actions pagination">
+
+        <li><a href="https://argmax.ai/blog/geodesic/" class="button previous">Approximate Geodesics for Deep Generative Models</a></li>
+
+        <li><a href="https://argmax.ai/blog/dvbfintro/" class="button next">Deep Variational Bayes Filter</a></li>
+  </ul>
+  
+</div>
+
+
+
+
+
+
+<div id="comments" class="comments">
+
+</div>
+
+<section id="footer">
+  <p class="copyright">&copy; argmax.ai  - <a href="https://argmax.ai//imprint">Imprint</a> - <a href="https://argmax.ai//data-protection">Data Protection</a> - <a href="https://argmax.ai//copyright">Copyright</a>
+</section><!-- <section id="footer">
+  <p class="copyright">&copy; argmax.ai. 
+  Powered by <a href="http://blog.getpelican.com/">Pelican</a>.</p>
+</section> -->
+		</div>
+
+	<!-- Scripts -->
+		<script src="https://argmax.ai/theme/js/skel.min.js"></script>
+		<script src="https://argmax.ai/theme/js/util.js"></script>
+		<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+		<script src="https://argmax.ai/theme/js/main.js"></script>
+
+	</body>
+</html>
